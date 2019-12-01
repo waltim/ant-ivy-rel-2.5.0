@@ -1,0 +1,48 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+If you have successfully followed and understood all the tutorials, you still might need to get a better picture of how to use Ivy in the real world.
+
+Here are some links which might be interesting:
+
+
+== SAnt
+
+link:https://web.archive.org/web/20091012101947/https://wiki.onehippo.com/display/OS/SAnt+build+system[SAnt] is an experimental build system based on Ant and Ivy. It can be interesting to use "as is", or to get insight on an interesting approach to manage your builds.
+
+
+== Spring Modules
+
+The link:https://web.archive.org/web/20130613141751/https://java.net/projects/springmodules[Spring Modules] project build system is based on Ant and Ivy, and it's really interesting to have a look at how a modularized project can take advantage of advanced Ant and Ivy features to make the build simpler.
+
+
+== Webwork
+
+The link:https://web.archive.org/web/20101203144930/http://www.opensymphony.com/webwork/[Webwork project] (which became Struts Action framework) uses Ant+Ivy for their build, and thus makes their framework very easy to use in an Ant+Ivy build system. They have a link:https://web.archive.org/web/20080807181009/http://wiki.opensymphony.com/display/WW/Dependencies[page documenting how to use Ivy with their framework], which can be an interesting reading, even if you don't plan to use Webwork.
+
+
+== Easing multi-module development
+
+Johan Stuyts, the author of SAnt, also contributed link:http://www.jaya.free.fr/ivy/doc/articles/ease-multi-module.html[a nice article] on his view of how to use Ivy on a multi-module environment.
+
+
+== Beginners Guide
+
+
+link:http://olmex.blogspot.in/2012/04/ivy-beginners-guide.html[Apache Ivy - Beginners Guide] is a step by step guide to assist beginners in understanding basic concepts/tasks and use them straight away in their projects either through Ant build or in Eclipse IDE.

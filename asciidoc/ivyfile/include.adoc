@@ -1,0 +1,70 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+*Tag:* include *Parent:* link:../ivyfile/configurations{outfilesuffix}[configurations]
+
+[*__since 1.3__*]
+
+Include configurations specified in another file.
+
+The included file should have a `configurations` tag as root tag, which follow the same specification as the link:../ivyfile/configurations{outfilesuffix}[configurations] tag of the Ivy file.
+
+This means that it can contain conf declarations, other file inclusions, and have link:configurations{outfilesuffix}#attributes[attributes] controlling conf mapping.
+
+When delivering an Ivy file with such an inclusion, the included descriptor file is inlined, i.e. Ivy removes the dependency on the external file.
+
+[*__since 2.5__*] Attributes inherited through included file are set on `dependencies` element due to the way module descriptor updater works currently.
+
+== Attributes
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|file|the file to include|Yes
+|=======
+
+== Examples
+
+[source,xml]
+----
+<ivy-module version="1.0">
+  <info organisation="myorg"
+         module="mymodule"/>
+  <configurations>
+    <include file="path/to/included-configurations.xml"/>
+    <conf name="conf3"/>
+  </configurations>
+  <dependencies>
+    <dependency name="mymodule1" rev="1.0"/>
+    <dependency name="mymodule2" rev="2.0" conf="conf2,conf3->*"/>
+  </dependencies>
+</ivy-module>
+----
+
+with `included-configurations.xml` like this:
+
+[source,xml]
+----
+<configurations defaultconfmapping="*->@">
+  <conf name="conf1" visibility="public"/>
+  <conf name="conf2" visibility="private"/>
+</configurations>
+----
+
+Defines 3 configurations, `conf1`, `conf2` and `conf3`. `mymodule1` is required in each configuration, with for each the same configuration (`conf1` is needed in `conf1`, `conf2` in `conf2`, and `conf3` in `conf3`) due to the `defaultconfmapping` defined in the included file.

@@ -1,0 +1,46 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= parsers
+
+*Tag:* parsers
+
+[ivysettings.parsers]#Defines a list of module descriptor parsers usable in Ivy. Each parser defines which resources (which descriptor file) it accepts.#
+The child tag used for the parser must be equal to a name of a parser type (added with the `typedef` tag).
+
+Note that when looking for a parser, Ivy queries the parsers list in the reverse order. So the last parser in the list will be queried first. Consequently, if the last parser accepts all resources, the other parsers will _never_ have a chance to parse the resource.
+
+Two parsers are available by default and thus do not need to be declared in this section:
+
+
+* Ivy file parser +
+ this is the parser used for Ivy XML files. This parser is used for resources that aren't accepted by any other parser.
+
+* POM parser +
+this parser is able to parse Maven 2 POM XML files
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|any module descriptor parser|adds a module descriptor parser to the list of available parsers|0..n
+|=======

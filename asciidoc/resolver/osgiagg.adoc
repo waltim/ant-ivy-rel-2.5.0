@@ -1,0 +1,62 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Aggregate OSGi Repository
+
+[]
+|=======
+|Tag|osgi-agg
+|Handle latest|yes
+|Handle publish|no
+|=======
+
+
+[*__since 2.4__*]
+
+This resolver is one of the resolvers which support link:../osgi{outfilesuffix}[OSGi(TM)] dependencies.
+
+[ivysettings.resolvers.osgi-agg]#This resolver is like a classic link:../resolver/chain{outfilesuffix}[chain] resolver, but with better support for OSGi metadata.#
+
+
+== Attributes
+
+This resolver shares the link:../settings/resolvers{outfilesuffix}#common[common attributes] of composite resolvers.
+
+
+== Elements
+
+As sub element, this resolver accept any kind of OSGi resolver: link:../resolver/obr{outfilesuffix}[obr], link:../resolver/updatesite{outfilesuffix}[updatesite], or any other `osgi-agg`.
+
+
+== Examples
+
+
+[source, xml]
+----
+
+<updatesite name="ivyde-updatesite" url="http://www.apache.org/dist/ant/ivyde/updatesite"/>
+<obr name="felix-repo" repoXmlURL="http://felix.apache.org/obr/releases.xml"/>
+<osgi-agg name="all-osgi">
+    <resolver ref="ivyde-updatesite"/>
+    <resolver ref="felix-repo"/>
+</osgi-agg>
+
+----
+
+An aggregated OSGi repository composed of the Apache IvyDE Eclipse update site and the Felix OBR.

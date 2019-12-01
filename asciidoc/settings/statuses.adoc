@@ -1,0 +1,72 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= statuses
+
+*Tag:* statuses
+
+[*__since 1.4__*]
+
+[ivysettings.statuses]#Defines the list of available statuses.#
+
+By default, Ivy has 3 statuses: `release`, `milestone` and `integration`. By adding a statuses section to your Ivy settings file, you define the statuses you want to use. Note that in this case, if you still want to have Ivy default statuses, you will have to declare them.
+
+The `integration` property on each status is only used for recursive delivery, an integration dependency being delivered if the caller is not in integration state itself.
+
+The `default` status is the one used when none is defined in a module descriptor. If not specified, it defaults to the last defined status.
+
+NOTE: The statuses order is important, the first is considered the more mature, the last the less mature. This is used to know if a status is compatible with a `latest._&lt;status&gt;_` version matcher.
+
+
+== Attributes
+
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|default|the name of the status to use when none is declared in an Ivy file|No, defaults to the last status declared
+|=======
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|link:../settings/status{outfilesuffix}[status]|defines a new status|0..n
+|=======
+
+
+== Examples
+
+
+[source, xml]
+----
+
+<statuses default="bronze">
+  <status name="gold" integration="false"/>
+  <status name="silver" integration="false"/>
+  <status name="bronze" integration="true"/>
+</statuses>
+
+----
+
+Defines 3 statuses, `gold`, `silver` and `bronze`. The default status used when none is declared in an Ivy file will be `bronze`.
+It is also considered an integration status, and thus doesn't trigger any recursive delivery.

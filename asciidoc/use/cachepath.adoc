@@ -1,0 +1,65 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+Constructs an Ant `path` consisting of artifacts in Ivy's cache (or origin location with depending on `useOrigin` setting) for a resolved module configuration.
+
+This is a link:../use/postresolvetask{outfilesuffix}[post resolve task], with all the behaviour and attributes common to all post resolve tasks.
+
+If you want to make your build more independent from Ivy, you could consider using the link:../use/retrieve{outfilesuffix}[retrieve task]. Once the artifacts are properly retrieved, you can use standard Ant path creation which makes Ivy not necessary any more.
+
+Built path is registered in the Ant project with a given id, and can thus be used like any other Ant path using `refid`.
+
+== Attributes
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|pathid|the id to reference the built path|Yes
+|conf|a comma separated list of the configurations to put in the created path|No. Defaults to the configurations resolved by the last resolve call, or `*` if no resolve was explicitly called
+|type|comma separated list of artifact types to accept in the path, `$$*$$` for all (*__since 1.2__*)|No. Defaults to `*`
+|settingsRef|(*__since 2.0__*) A reference to Ivy settings that must be used by this task|No, `ivy.instance` is taken by default.
+|=======
+
+== Examples
+
+[source,xml]
+----
+<cachepath pathid="default.classpath" conf="default"/>
+----
+
+Construct an Ant path composed of all artifacts being part of the default configuration obtained through the last resolve call.
+
+'''
+
+[source,xml]
+----
+<cachepath pathid="default.classpath" conf="default" useOrigin="true"/>
+----
+
+Same as before but will use the original location for local artifacts, and the cache location for other artifacts.
+
+'''
+
+[source,xml]
+----
+<ivy:cachepath organisation="emma" module="emma" revision="2.0.4217" inline="true" conf="ant" pathid="emma.classpath"/>
+<taskdef resource="emma_ant.properties" classpathref="emma.classpath"/>
+----
+
+Resolves the Emma module in version 2.0.4217, constructs an Ant path with the corresponding artifacts, and then defines the Emma tasks using this path.

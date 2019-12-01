@@ -1,0 +1,56 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+[*__since 1.4__*]
+
+Finds the latest revision of a module matching a given version constraint.
+
+A version constraint is what is used when declaring a link:../ivyfile/dependency{outfilesuffix}[dependency] on a module.
+If the module is not found, the property is not set.
+
+== Attributes
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|organisation|the organisation of the module to find|Yes
+|module|the name of the module to find|Yes
+|branch|the branch of the module to find|No, defaults to the default branch for the given module
+|revision|the revision constraint to apply|Yes
+|property|the property to set with the found revision|No, defaults to `ivy.revision`
+|settingsRef|a reference to Ivy settings that must be used by this task (*__since 2.0__*)|No, defaults to `ivy.instance`.
+|=======
+
+== Examples
+
+[source,xml]
+----
+<ivy:findrevision organisation="apache" module="ivy" revision="latest.integration"/>
+----
+
+finds the latest version of Ivy available in the repository and sets the property `ivy.revision` according to what was found.
+
+'''
+
+[source,xml]
+----
+<ivy:findrevision organisation="apache" module="ivy" revision="1.0+"/>
+----
+
+same as above but only with 1.0 sub versions.

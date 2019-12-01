@@ -1,0 +1,38 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+== JVM compatibility
+
+Up to Ivy 2.3.x, a minimum of Java 1.4 is required.
+
+For Ivy 2.4.0, a minimum of Java 5 is required.
+
+Since Ivy 2.5.0, a minimum of Java 7 is required.
+
+== Apache Ant
+
+Ivy doesn't require a specific version of Ant as long as the Ant being used complies with the JVM compatibility requirements noted above.
+
+== Other optional dependencies
+
+The required versions of the Apache HttpClient, Jsch or any optional dependency are to be checked against Ivy's dependency descriptor. In Ivy's source, check for the `ivy.xml` file at the root. Or the `pom.xml` of `org.apache.ivy#ivy` in the Maven Central repository.
+
+== Environment / Configuration Requirements
+
+Ivy does not at this time support multithreaded use. It thus should not be used with the Ant `<parallel>` task.

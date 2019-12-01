@@ -1,0 +1,54 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+*Tag:* conflicts *Parent:* link:../ivyfile{outfilesuffix}[ivy-module]
+
+(*__since 2.0__*) The conflicts section is deprecated.  Use link:../ivyfile/conflict{outfilesuffix}[conflict] instead.
+
+Container for conflict manager elements, used to indicate how conflicts should be resolved for this module.
+
+The list of built-in conflict managers available is listed in the link:../settings/conflict-managers{outfilesuffix}[conflict manager settings page].
+
+Conflict managers are used during the resolve operation, i.e. when Ivy analyses the graph of dependencies
+and downloads corresponding Ivy files and artifacts. Managing conflict at resolve time
+minimizes downloads: when a module is evicted by a conflict manager, it is not downloaded.
+
+There are two things optimized during conflict resolution: download of artifacts and download
+of Ivy files. The first is always ensured by Ivy, i.e. artifacts of a module evicted will never
+be downloaded. The second is not as simple to handle because in order to know what the conflicts are
+Ivy needs to know the dependency graph, and in order to know the dependency graph, it has to download
+Ivy files. But Ivy is highly optimized for this too, and it tries to evict modules as soon as possible.
+
+That's why the order of dependencies is important for download optimization. Indeed Ivy
+traverses the dependency graph in the order in which dependencies are declared in the Ivy files,
+and each time it encounters a dependency on a module, it first checks if there is a conflict on this module,
+and if this is the case, it asks the conflict manager to resolve the conflict. Then if the module is evicted,
+it does not download its Ivy file, and the whole branch is not traversed, which can save
+a lot of time.
+
+If this container is not present, a default conflict manager is used for all modules. The current default conflict manager is the `latest-revision` conflict manager.
+
+== Child elements
+
+
+[options="header",cols="20%,60%,20%"]
+|=======
+|Element|Description|Cardinality
+|link:../ivyfile/manager{outfilesuffix}[manager]|declares a conflict manager for this module|1..n
+|=======

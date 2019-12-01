@@ -1,0 +1,159 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Multiple Resolvers
+
+This tutorial is an example of how modules can be retrieved by multiple resolvers. Using multiple resolvers can be useful in many contexts. For example:
+
+
+    * separating integration builds from releases +
+
+    * using a public repository for third party modules and a private one for internal modules +
+
+    * use a repository for storing modules which are not accurate in an unmanaged public repository +
+
+    * use a local repository to expose builds made on one developer's station +
+
+
+In Ivy, the use of multiple resolvers is supported by a compound resolver called the chain resolver.
+
+In our example, we will simply show you how to use two resolvers, one for a local repository and one using the Maven 2 repository.
+
+
+== Project Description
+
+
+=== The project: chained-resolvers
+
+The project is very simple and contains only one simple class: `example.Hello`.
+
+It depends on two libraries: Apache's `commons-lang` and a custom library named `test` (sources are included in `test-1.0.jar` file). The test library is used by the project to uppercase a string, and `commons-lang` is used to capitalize the same string.
+
+Here is the content of the project:
+
+
+    * build.xml: the Ant build file for the project +
+
+    * ivy.xml: the Ivy project file +
+
+    * src/example/Hello.java: the only class of the project +
+
+Let's have a look at the *ivy.xml* file:
+
+[source, xml]
+----
+
+include::src/example/chained-resolvers/chainedresolvers-project/ivy.xml[]
+
+----
+
+As we'd expect, the Ivy file declares this module to be dependent on the two libraries it uses: `commons-lang` and `test`. Note that we didn't specify the `org` for the dependency `test`. When we exclude `org`, Ivy assumes it is in the same `org` as the declaring module. (in this example, it's `org.apache`).
+
+
+=== The Ivy Settings
+
+The settings are defined in the `ivysettings.xml` file located in the `settings` directory of the project. Below are its contents, followed by an explanation of what it's doing.
+
+
+[source]
+----
+include::src/example/chained-resolvers/settings/ivysettings.xml[]
+----
+
+
+=== The *settings* tag
+
+This tag initializes Ivy with some parameters. Here only one parameter is set, the name of the resolver to use by default.
+
+
+=== The *resolvers* tag
+
+The resolvers section defines the list of resolvers that Ivy will use to locate artifacts. In our example, we have only one resolver named `chain-example`, which is unique in that it defines a list (hence a chain) of resolvers.
+
+The resolvers in this chain are:
+
+
+    * `libraries` : It is a filesystem resolver, so looks at a directory structure to retrieve the artifacts. This one is configured to look in the `repository` sub directory of the directory that contains the `ivysettings.xml` file. +
+
+    * `ibiblio` : It looks in the ibiblio Maven repository to retrieve the artifacts. +
+
+
+That's it, we have just configured a chain of resolvers!
+
+
+== Walkthrough
+
+
+
+=== Step 1: Preparation
+
+Open a shell (or command line) window, and go to the `src/example/chained-resolvers` directory.
+
+
+
+=== Step 2: clean directory tree
+
+On the prompt type: `ant`
+
+This will clean up the entire project directory tree and Ivy cache. You can do this each time you want to clean up this example.
+
+
+[NOTE]
+====
+
+In almost all examples, we provide a `clean` target, as the default target. Since most examples use the same Ivy cache, you will clean the whole Ivy cache each time you call this target.
+
+Cleaning the Ivy cache is something you can do without fear (except for performance): it's only a cache, so everything can be (and should be) obtained again from repositories. This may sound strange to those coming from Maven 2 land. But remember that in Ivy, the cache is not a local repository and the two are completely isolated.
+
+====
+
+
+
+
+=== Step 3: run the project
+
+Go to `chained-resolvers` project directory. And simply run `ant`.
+
+
+[source,shell]
+----
+
+include::asciidoc/tutorial/log/chained-resolvers.txt[]
+
+----
+
+
+
+We can see in the log of the resolve task, that the two dependencies have been retrieved (2 artifacts) and copied to the Ivy cache directory (2 downloaded).
+
+Also notice that the `run` Ant target succeeded in using both `commons-lang.jar` coming from the ibiblio repository and `test.jar` coming from the local repository.
+
+
+== Going further
+
+This very simple example helps us see how to set up two resolvers in a chain. The link:../resolver/chain{outfilesuffix}[chain resolver's reference documentation] is available for those who would like to know all the features offered by this resolver.
+
+Below are a few more interesting things worth knowing about chain resolvers. After reading them, go ahead and try tweaking this example using your new wealth of knowledge!
+
+
+    * a chain is not limited to two nested resolvers, you can use as many as you want +
+
+    * by setting `returnFirst="true"`, you can have a chain which stops as soon as it has found a result for a given module +
+
+    * by setting `dual="true"`, the full chain will be used both for module descriptors and artifacts, while setting `dual="false"`, the resolver in the chain which found the module descriptor (if any) is also used for artifacts +

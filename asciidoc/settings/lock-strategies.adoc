@@ -1,0 +1,54 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Lock Strategies
+
+*Tag:* lock-strategies
+
+[*__since 2.0__*]
+
+[ivysettings.lock-strategies]#Defines a list of lock strategies usable in Ivy.#
+
+A lock strategy is used by a cache manager to decide when and how locking should be performed (see link:../settings/cache[caches] to see how to configure the lock strategy to use).
+
+The following strategies are registered by default:
+
+* *no-lock* +
+ This lock strategy actually performs no locking at all, and thus should not be used in an environment where the cache is shared by multiple processes.
+
+* *artifact-lock* +
+ This strategy acquires a lock whenever a module descriptor or an artifact is downloaded to the cache, which makes a good solution when you want to share your repository cache.
+Note that this strategy is based on file locking, performed by default using the `java.io.File.createNewFile()` atomicity (which is documented as atomic in the javadoc, but not recommended to perform locks).
+
+
+* *artifact-lock-nio* (*__since 2.4__*) +
+ Like the `artifact-lock` strategy, this one also acquires a lock whenever a module descriptor or artifact is downloaded to the cache. But here the implementation is done with a `java.nio.FileLock`.
+
+
+The child tag used for the lock strategy must be equal to a name of a lock strategy type (added with the `typedef` tag).
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|any lock strategy|adds a lock strategy to the list of available ones|0..n
+|=======

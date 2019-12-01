@@ -1,0 +1,110 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+[*__since 1.4__*]
+
+Generates reports about dependencies among several modules in the repository (repreport stands for repository report).
+
+This task is similar to the link:../use/report{outfilesuffix}[report] task, except that instead of working on a single module you just resolved, it works with a set of modules in your repository.
+
+Note that the set of modules for which you generate the report is determined by setting organisation module and revision and using a matcher, but also by the dependencies of these modules. No dependency is excluded.
+
+Usually the most useful report is a graph, you can generate either a GraphML file that you can then easily link:../yed{outfilesuffix}[layout using yEd], or a DOT file which is the format recognized by Graphviz, which is a free tool that does automatic graph layout, and can thus be used to generate automatically a GIF, PNG or SVG of the dependencies between all your modules.
+
+*Limitation*: this task requires to be able to browse the repository, and is thus limited to resolvers supporting repository listing. In particular, it means it doesn't work to report all organizations in a repository using m2compatible mode.
+Moreover, to be able to list organizations, this task requires an [organisation] token in the resolver(s) used.
+
+== Attributes
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|organisation|A pattern matching the organisation of the modules for which the report should be generated|No, defaults to `$$*$$`
+|module|A pattern matching the name of the modules for which the report should be generated|No, defaults to `$$*$$`
+|branch|The name of the branch of the modules for which the report should be generated|No, defaults to no branch specified
+|revision|The revision of the modules for which the report should be generated. Only one revision per module will be used, so most of the time keeping the default (`latest.integration`) is the best thing to do, because it's not very easy to specify only one revision for several modules.|No, defaults to `latest.integration`
+|todir|the directory to which reports should be generated|No, defaults to execution directory
+|outputname|the name to use for the generate file (without extension)|No, defaults to `ivy-repository-report`
+|xml|`true` to generate a XML report, `false` otherwise|No, defaults to `true`
+|xsl|`true` to generate a report using XSLT, `false` otherwise|No, defaults to `false`
+|xslfile|indicates which xsl file should be used to generate the report|Yes, if you want to use XSLT
+|xslext|indicates the extension to use when generating report using XSLT|No, defaults to `html`
+|graph|`true` to generate GraphML file, `false` otherwise|No, defaults to `false`
+|dot|`true` to generate Graphviz DOT format file, `false` otherwise|No, defaults to `false`
+|matcher|the name of the matcher to use for matching modules names and organisations in your repository|No. Defaults to `exactOrRegexp`
+|validate|`true` to force Ivy files validation against ivy.xsd, `false` to force no validation|No. Defaults to default Ivy value (as configured in settings)
+|settingsRef|A reference to Ivy settings that must be used by this task (*__since 2.0__*)|No, defaults to `ivy.instance`.
+|=======
+
+== Examples
+
+To generate a XML report for all the latest versions of all the modules in your repository:
+
+[source,xml]
+----
+<ivy:repreport/>
+----
+
+'''
+
+To generate a GraphML report for all the latest versions of all the modules in your repository:
+
+[source,xml]
+----
+<ivy:repreport xml="false" graph="true"/>
+----
+
+'''
+
+To generate a XML report for all the latest versions of the modules from the organisation foo in your repository:
+
+[source,xml]
+----
+<ivy:repreport organisation="foo"/>
+----
+
+'''
+
+To generate a XML report for all the versions on the 1.x stream of the modules named bar* from the organisation foo in your repository:
+
+[source,xml]
+----
+<ivy:repreport organisation="foo" module="bar*" revision="1.+" matcher="glob"/>
+----
+
+'''
+
+To generate an XML report using a custom stylesheet:
+
+[source,xml]
+----
+<ivy:repreport xsl="true" xslfile="my-custom-stylesheet.xsl" xslext="xml"/>
+----
+
+'''
+
+To generate an XML report using a custom stylesheet which needs some parameters:
+
+[source,xml]
+----
+<ivy:repreport xsl="true" xslfile="my-custom-stylesheet.xsl" xslext="xml">
+    <param name="param1" expression="value1"/>
+    <param name="param2" expression="value2"/>
+</report>
+----

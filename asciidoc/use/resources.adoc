@@ -1,0 +1,93 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+[*__since 2.3__*] (*__Ant 1.7 required__*)
+
+`ivy:resources` is an Ant link:https://ant.apache.org/manual/Types/resources.html#collection[resource collection], containing files found by an Ivy resolve, which then can be used with any task working with resources like `copy` or `import`.
+
+This datatype shares the same attributes, child elements and behaviour of a link:../use/postresolvetask{outfilesuffix}[post resolve task]. It is not expected to be used as an Ant task though, only as a resource collection.
+
+== Examples
+
+[source,xml]
+----
+<ivy:resources file="path/to/ivy.xml"/>
+----
+
+Build a resource collection of every artifacts of all dependencies declared in `path/to/ivy.xml` file.
+
+'''
+
+[source,xml]
+----
+<ivy:resources file="path/to/ivy.xml" transitive="false"/>
+----
+
+Same as above, but with transitive dependencies disabled.
+
+'''
+
+[source,xml]
+----
+<ivy:resources file="path/to/ivy.xml" conf="default, test"/>
+----
+
+Build a resource collection of every artifacts of the dependencies declared in the configuration default and test of the `path/to/ivy.xml` file.
+
+'''
+
+[source,xml]
+----
+<ivy:resources file="path/to/ivy.xml" type="jar"/>
+----
+
+Build a resource collection of every `jar` artifact of all dependencies declared in `path/to/ivy.xml` file.
+
+'''
+
+[source,xml]
+----
+<ivy:resources organisation="apache" module="commons-lang" revision="2+" inline="true"/>
+----
+
+Build a resource collection of every artifacts of `commons-lang` module revision 2+ from the repository, with its dependencies.
+
+'''
+
+[source,xml]
+----
+<ivy:resources>
+    <dependency org="apache" module="commons-lang" rev="2+"/>
+    <dependency org="apache" module="commons-logging" rev="1.1"/>
+    <exclude org="apache" module="log4j"/>
+</ivy:resources>
+----
+
+Build a resource collection of every artifacts of both `commons-lang` and `commons-logging`, with their dependencies but not `log4j`.
+
+'''
+
+[source,xml]
+----
+<ivy:resources>
+    <dependency org="org.slf4j" module="slf4j" rev="1.6" conf="api,log4j"/>
+</ivy:resources>
+----
+
+Build a resource collection of every artifacts of the configurations `api` and `log4j` of `slf4j`.

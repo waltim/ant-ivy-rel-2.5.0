@@ -1,0 +1,203 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= version-matchers
+
+*Tag:* version-matchers
+
+[*__since 1.4__*]
+
+[ivysettings.version-matchers]#Defines a list of version matchers.#
+
+The child tag used for the version matcher must be equal to a name of a report outputter type (added with the `typedef` tag).
+
+A version matcher is used to evaluate if a dependency version constraint matches a dependency version.
+
+
+== Attributes
+
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|usedefaults|when set to true, includes the built-in version matchers (Latest, Sub Revision, and Version Ranger Matcher). Exact Revision Matcher is always included|No, defaults to false
+|=======
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|any version matcher|adds a version matcher to the list of available ones|0..n
+|=======
+
+
+
+== Built-in Version Matchers
+
+
+=== Exact Revision Matcher
+
+A matcher that matches a dependency revision id to the module revision id using simple string equality.
+
+
+=== Sub Revision Matcher
+
+A matcher that matches all revisions starting with a specific prefix. The syntax is: `[prefix]+`
+
+
+[options="header"]
+|=======
+|Revision|Matches
+|1.0.+|all revisions starting with '1.0.', like 1.0.1, 1.0.5, 1.0.a
+|1.1+|all revisions starting with '1.1', like 1.1, 1.1.5, but also 1.10, 1.11
+|=======
+
+
+
+=== Latest (Status) Matcher
+
+
+A matcher that matches versions based on their status. The predefined statuses in Ivy are `release`, `milestone` and `integration`. It's possible to define your own statuses, see link:../settings/statuses{outfilesuffix}[statuses] for more details.
+
+
+[options="header"]
+|=======
+|Revision|Matches
+|latest.integration|all versions
+|latest.milestone|all modules having at least 'milestone' as status
+|latest.release|all modules having at least 'release' as status
+|latest.[any status]|all modules having at least the specified status
+|=======
+
+
+
+=== Version Range Matcher
+
+
+Range types are exhaustively listed by example in the table below.
+
+
+[options="header"]
+|=======
+|Revision|Matches
+| [1.0,2.0] | all versions greater or equal to 1.0 and lower or equal to 2.0
+| [1.0,2.0[ | all versions greater or equal to 1.0 and lower than 2.0
+| ]1.0,2.0] | all versions greater than 1.0 and lower or equal to 2.0
+| ]1.0,2.0[ | all versions greater than 1.0 and lower than 2.0
+| [1.0,) | all versions greater or equal to 1.0
+| ]1.0,) | all versions greater than 1.0
+| (,2.0] | all versions lower or equal to 2.0
+| (,2.0[ | all versions lower than 2.0
+|=======
+
+
+
+=== Version Pattern Matcher
+
+
+The version pattern matcher allows for more flexibility in pattern matching at the cost of adding a matcher declaration in Ivy settings.  A simple example is given below.
+
+
+==== Settings.xml
+
+
+[source, xml]
+----
+
+<pattern-vm>
+  <match revision="foo" pattern="${major}\.${minor}\.\d+" args="major, minor" matcher="regexp"/>
+</pattern-vm>
+
+----
+
+
+==== Ivy.xml
+
+
+[source, xml]
+----
+
+<dependency org="acme" name="tool" rev="foo(1, 3)"/>
+
+----
+
+The version pattern matcher may contain more than one match element.  The matcher will attempt to match a dependency revision against each match in sequence, checking the revision tag (e.g. foo(..)) and then the pattern.
+Matcher types may be one of "regexp", "exact", "glob", or "exactOrRegexp".  Glob pattern matching requires Apache ORO 2.0.8 or higher to be on the classpath.
+
+
+=== Maven timestamped snapshot version matcher
+
+[*__since 2.5__*]
+
+Maven has the notion of timestamped snapshots, which essentially are snapshot versions of a particular Maven artifact, but have a specific timestamp associated with them so that the snapshot revision (which by nature are changing over time), can be traced back to the exact artifacts. Maven allows other artifacts to depend on such timestamped snapshots.
+
+Ivy too allows such timestamped dependencies to be part of the module's dependencies. For such dependencies to be properly parsed and resolved, a `maven-tsnap-vm` version matcher needs to be configured in the Ivy settings and link:../resolver/ibiblio{outfilesuffix}[ibiblio resolver] must be one of the resolvers that are used for dependency resolution.
+
+NOTE: Maven has a specific syntax for timestamped snapshot versions and only such versions are understood by Ivy.
+
+Configuring the `maven-tsnap-vm` can be done as follows in the Ivy settings file:
+
+[source,xml]
+----
+<ivysettings>
+    <version-matchers ...>
+        <maven-tsnap-vm/>
+    </version-matchers>
+    ...
+----
+
+
+An example timestamped snapshot dependency in an Ivy module would look like:
+
+[source,xml]
+----
+
+<ivy-module version="2.4">
+    <info organisation="org.apache.ivy"
+          module="maven-snapshot-deps-test"
+          revision="1.2.3"/>
+    <dependencies>
+
+        <dependency org="org.apache.ivy.maven-snapshot-test" name="foo-bar" rev="5.6.7-20170911.130943-1"/>
+    </dependencies>
+</ivy-module>
+----
+
+Notice the `5.6.7-20170911.130943-1` revision on the `foo-bar` dependency - that represents a timestamped snapshot. For this Ivy module to be resolved correctly, the Ivy settings file should be both backed by the `maven-tsnap-vm` version matcher and a `m2compatible` `ibiblio` resolver, so the settings file would typically look like:
+
+[source,xml]
+----
+<ivysettings>
+    <settings defaultResolver="m2"/>
+    <caches defaultCacheDir="${user.home}/.ivy/cache/"/>
+    <version-matchers usedefaults="true">
+        <maven-tsnap-vm/>
+    </version-matchers>
+
+    <resolvers>
+        <ibiblio name="m2" m2compatible="true" useMavenMetadata="true" root="file://${user.home}/.m2"/>
+    </resolvers>
+
+</ivysettings>
+
+----
+

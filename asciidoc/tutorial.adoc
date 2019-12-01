@@ -1,0 +1,66 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Ivy Tutorials
+
+The best way to learn is to practice! That's what the Ivy tutorials will help you to do, to discover some of the great Ivy link:https://ant.apache.org/ivy/features.html[features].
+
+For the first tutorial you won't even have to install Ivy (assuming you have Ant and a JDK properly installed), and it shouldn't take more than 30 seconds.
+
+== First Tutorial
+
+
+    * Make sure you have link:https://ant.apache.org/[Ant] 1.9.9 or greater and a link:http://www.oracle.com/technetwork/java/javase/downloads/index.html[Java JDK] properly installed +
+
+    * Copy link:samples/build.xml[this build file] to an empty directory on your local filesystem (and make sure you name it `build.xml`) +
+
+    * Open a console in that directory and run the command: `ant`. That's it! +
+
+If you have any trouble, check our link:https://ant.apache.org/ivy/faq.html[FAQ].
+
+OK, you've just seen how easy it is to take your first step with Ivy. Go ahead with the other tutorials, but before you do, make sure you have properly link:install{outfilesuffix}[installed] Ivy and downloaded the tutorials sources (included in all Ivy distributions, in the link:https://gitbox.apache.org/repos/asf?p=ant-ivy.git;a=tree;f=src/example[src/example] directory).
+
+== List of available tutorials
+
+The following tutorials are available:
+
+
+    * link:tutorial/start{outfilesuffix}[Quick Start] +
+        Guides you through your very first steps with Ivy.
+
+    * link:tutorial/defaultconf{outfilesuffix}[Adjusting default settings] +
+        Gives you a better understanding of the default settings and shows you how to customize them to your needs.
+
+    * link:tutorial/multiple{outfilesuffix}[Multiple Resolvers] +
+        Teaches you how to configure Ivy to find its dependencies in multiple places.
+
+    * link:tutorial/dual{outfilesuffix}[Dual Resolver] +
+        Helps you configure Ivy to find Ivy files in one place and artifacts in another.
+
+    * link:tutorial/dependence{outfilesuffix}[Project dependencies] +
+        A starting point for using Ivy in a multi-project environment.
+
+    * link:tutorial/multiproject{outfilesuffix}[Using Ivy in multiple projects environment] +
+        A more complex example demonstrating the use of Ant+Ivy in a multi-project environment.
+
+    * link:tutorial/conf{outfilesuffix}[Using Ivy Module Configurations] +
+        Shows you how to use configurations in an Ivy file to define sets of artifacts.
+
+    * link:tutorial/build-repository{outfilesuffix}[Building a repository] +
+        Shows you how to build your own enterprise repository.

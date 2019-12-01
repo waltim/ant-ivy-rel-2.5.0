@@ -1,0 +1,89 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+The `configure` task is used to configure Ivy with a settings XML file.
+
+See link:../settings{outfilesuffix}[Settings Files] for details about the settings file itself.
+
+[*__since 2.0__*]
+
+The file loaded used to be called __configuration__ file in versions prior to 2.0. The name __settings__ and the use of the `ivy.settings.file` is new to 2.0.
+
+It is also possible to configure Ivy with the link:../use/settings{outfilesuffix}[settings] declaration. The difference with this task is that when using the settings declaration, the configuration of Ivy will be done when the settings are first needed (for instance, when you do a resolve), while the configure task will perform a configuration of Ivy instantly, which makes it easier to see the problem if something goes wrong.
+
+== Attributes
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|settingsId|The settings id usable in the `settingsRef` attributes of the Ivy task that needs a setting.|No, defaults to `ivy.instance`
+|file|path to the settings file to use
+.2+|No. If a file is provided, URL is ignored. If none are provided, then it attempts to find a file at `${ivy.settings.file}`, and if this file does not exist, it uses `${ivy.settings.url}` (*__since 2.3__*) or a link:../samples/ivysettings-default.xml[default settings file]
+|url|URL of the settings file to use
+|override|Specify what to do when another settings with the same id has already been loaded. +
+* `true`: the current settings will take precedence over any previously defined setting with this id +
+* `false`: the current settings will not override a previously defined setting with this id +
+* `notallowed`: an error is raised if a settings has already been defined with this id|No, defaults to `notallowed`
+|host|HTTP authentication host
+.4+.^|No, unless authentication is required
+|realm|HTTP authentication realm
+|username|HTTP authentication user name
+|passwd|HTTP authentication password
+|=======
+
+== HTTP Authentication
+
+If any of the URLs you use in Ivy (especially in dependency resolvers) needs HTTP authentication, then you have to provide the `host`, `realm`, `username` and `passwd` attributes of the configure task. These settings will then be used in any further call to Ivy tasks.
+
+(*__since 1.4__*) It's also possible to configure authentication settings for multiple URLs. This can be done with the `<credentials>` subelements. See the examples for more details.
+
+== Examples
+
+=== Simplest settings
+
+[source,xml]
+----
+<ivy:configure/>
+----
+
+Use either `${ivy.settings.file}` if it exists, or the link:../samples/ivysettings-default.xml[default settings file]
+
+=== Configure with a file
+
+[source,xml]
+----
+<ivy:configure file="myconffile.xml"/>
+----
+
+=== Configure with an URL
+
+[source,xml]
+----
+<ivy:configure url="http://mysite.com/myconffile.xml"/>
+----
+
+=== Configure multiple URLs which require authentication
+
+[source,xml]
+----
+<ivy:configure file="path/to/my/ivysettings.xml">
+  <credentials host="myhost.com" realm="My Realm" username="myuser" passwd="mypasswd"/>
+  <credentials host="yourhost.com" realm="Your Realm" username="myuser" passwd="myotherpasswd"/>
+</ivy:configure>
+----

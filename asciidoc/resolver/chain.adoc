@@ -1,0 +1,106 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Chain resolver
+
+[]
+|=======
+|Tag|chain
+|Handle latest|depends on sub resolvers
+|Handle publish|delegates to first sub resolver in chain
+|=======
+
+
+[ivysettings.resolvers.chain]#This resolver is only a container of a chain of other resolvers.# The sub resolvers can be any resolver, including a chain. An attribute `enable` to indicate if the chain must be iterated after the first found or not (at least when asking for a latest revision). If the chain is iterated, then it's the latest among the ones found that is returned. If the chain is not iterated, then it's the first found which is returned.
+
+== Attributes
+
+This resolver shares the link:../settings/resolvers{outfilesuffix}#common[common attributes] of composite resolvers.
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|returnFirst|true if the first found should be returned.|No, defaults to false
+|dual|true if the chain should behave like a dual chain. (*__since 1.3__*)|No, defaults to false
+|=======
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|any resolver|a sub resolver to use|1..n
+|=======
+
+
+== Examples
+
+
+[source, xml]
+----
+
+<chain name="test">
+  <filesystem name="1">
+    <ivy pattern="${ivy.settings.dir}/1/[organisation]/[module]/ivys/ivy-[revision].xml"/>
+    <artifact pattern="${ivy.settings.dir}/1/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+  </filesystem>
+  <ivyrep name="2"/>
+</chain>
+
+----
+
+Both a filesystem and ivyrep will be used to look for Ivy files. If a dynamic revision is required, then both the filesystem and ivyrep will be queried to find the most recent revision among the two resolvers. Once the most recent revision is found in one resolver, it's the same resolver which will be used to download artifacts.
+
+'''
+
+
+[source, xml]
+----
+
+<chain name="test" returnFirst="true">
+  <filesystem name="1">
+    <ivy pattern="${ivy.settings.dir}/1/[organisation]/[module]/ivys/ivy-[revision].xml"/>
+    <artifact pattern="${ivy.settings.dir}/1/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+  </filesystem>
+  <ivyrep name="2"/>
+</chain>
+
+----
+
+Same as before, except that if a revision is found in the filesystem then ivyrep will not be queried: its the filesystem which will be used for both the Ivy file and the artifacts.
+
+'''
+
+
+[source, xml]
+----
+
+<chain name="test" dual="true">
+  <filesystem name="1">
+    <ivy pattern="${ivy.settings.dir}/1/[organisation]/[module]/ivys/ivy-[revision].xml"/>
+    <artifact pattern="${ivy.settings.dir}/1/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+  </filesystem>
+  <ivyrep name="2"/>
+</chain>
+
+----
+
+Same as first example, except that once a module is found by either filesystem or ivyrep, then it's the whole chain which will be queried to download the artifacts. So in this case Ivy file and artifacts may be split across the two resolvers for the same module.

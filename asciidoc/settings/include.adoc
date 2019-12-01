@@ -1,0 +1,89 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= include
+
+*Tag:* include
+
+[*__since 1.3__*]
+
+[ivysettings.include]#Includes another Ivy settings file as if it were part of this one.#
+
+The included Ivy settings file has to be a complete well formed Ivy settings file, i.e. it does have to include the `<ivysettings>` tag.
+
+
+== Attributes
+
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|url|a URL to the Ivy settings file to include|Yes, unless file is specified
+|file|a path to the Ivy settings file to include|Yes, unless url is specified
+|optional|indicates whether Ivy should throw an error if the specified file doesn't exist (*__since 2.4__*).|No, default to false
+|=======
+
+
+== Examples
+
+
+[source, xml]
+----
+
+<ivysettings>
+  <property name="myrepository" value="path/to/my/real/rep"/>
+  <settings defaultResolver="default"/>
+  <include file="path/to/ivysettings-default.xml"/>
+</ivysettings>
+
+----
+
+with ivysettings-default.xml:
+
+[source, xml]
+----
+
+<ivysettings>
+  <property name="myrepository" value="path/to/rep" overwrite="false"/>
+  <resolvers>
+    <ivyrep name="default" ivyroot="${myrepository}"/>
+  </resolvers>
+</ivysettings>
+
+----
+
+The included Ivy settings defines a resolver named default, which is an ivyrep resolver, with its root configured as being the value of myrepository variable. This variable is given the value `path/to/rep` in the included file, but because the attribute overwrite is set to false, it will not override the value given in the main Ivy settings including this one, so the value used for myrepository will be `path/to/my/real/rep`.
+
+'''
+
+
+[source, xml]
+----
+
+<ivysettings>
+  <include file="ivysettings-macro.xml"/>
+  <resolvers>
+    <mymacro name="includeworks" mymainrep="included/myrep" mysecondrep="included/secondrep"/>
+  </resolvers>
+</ivysettings>
+
+----
+
+with ivysettings-macro.xml being the Ivy settings example given on the link:../settings/macrodef{outfilesuffix}[macrodef documentation page].
+This lets us easily reuse the custom macro resolver.

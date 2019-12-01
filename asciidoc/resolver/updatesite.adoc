@@ -1,0 +1,70 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Eclipse Updatesite resolver
+
+[]
+|=======
+|Tag|updatesite
+|Handle latest|yes
+|Handle publish|no
+|=======
+
+
+[*__since 2.3__*]
+
+[ivysettings.resolvers.updatesite]#This resolver is one of the resolvers which support link:../osgi{outfilesuffix}[OSGi(TM)] dependencies. It resolves modules (OSGi bundles) which are hosted in an Eclipse(TM) update site.#
+
+This resolver supports old style Eclipse updatesite, based on a single file, site.xml. It also supports Eclipse P2 repositories.
+
+
+== Attributes
+
+This resolver shares the link:../settings/resolvers{outfilesuffix}#common[common attributes] of composite resolvers.
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|url|the URL of the Eclipse updatesite|Yes
+|requirementStrategy|defines how strict should be the OSGi resolution. Can be one of `first` or `noambiguity`|No, default to `noambiguity`
+|metadataTtl|the time in milliseconds the updatesite metadata are considered up to date|No, default to 3600000 (1 hour)
+|forceMetadataUpdate|force the update of the updatesite metadata without checking their freshness|No, default to false
+|=======
+
+
+The requirement strategy is defining how the resolver should behave when facing several choices. In the OSGi dependency model, an `Import-Package` requirement can be satisfied by several different bundles. So when resolving such requirement, Ivy will first look into the already resolved bundles if one provides that package. If it fails to find one, then two behaviours can occur:
+
+
+    * if the requirement strategy is `first`, among the bundles satisfying the requirement, it will choose the first one. A warning will be logged about the choice Ivy has to arbitrarily do. +
+
+    * if the requirement strategy is `noambiguity`, Ivy will make the resolution fail. +
+
+
+
+== Examples
+
+
+[source, xml]
+----
+
+<updatesite name="ivyde-updatesite" url="http://www.apache.org/dist/ant/ivyde/updatesite"/>
+
+----
+
+A simple repository configured to load the Apache IvyDE Eclipse update site.

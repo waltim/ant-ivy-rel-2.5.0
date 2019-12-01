@@ -1,0 +1,63 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= VFS resolver
+
+[]
+|=======
+|Tag|vfs
+|Handle latest|depend on VFS capacity, usually yes
+|Handle publish|depend on VFS capacity, usually yes
+|=======
+
+[*__since 1.4__*]
+
+[ivysettings.resolvers.vfs]#This resolver is certainly the most capable, since it relies on link:https://commons.apache.org/proper/commons-vfs/[Apache Commons VFS], which gives an uniform access to link:https://commons.apache.org/proper/commons-vfs/filesystems.html[a good number of file systems], including FTP, WebDAV, zip, ...#
+
+
+== Attributes
+
+This resolver shares the link:../settings/resolvers{outfilesuffix}#common[common attributes] of standard resolvers.
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|ivy|defines a pattern for Ivy files, using the pattern attribute|0..n
+|artifact|defines a pattern for artifacts, using the pattern attribute|1..n
+|=======
+
+
+
+== Example
+
+
+[source, xml]
+----
+
+<vfs name="vfs-resolver">
+  <ivy pattern="sftp://username:password@host/[organisation]/[module]/[revision]/ivy.xml"/>
+  <artifact pattern="sftp://username:password@host/[organisation]/[module]/[revision]/[artifact].[ext]"/>
+</vfs>
+
+----
+
+Access Ivy and artifact files using SFTP.

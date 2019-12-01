@@ -1,0 +1,57 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= dest
+
+*Tag:* dest
+
+[ivysettings.namespaces.namespace.rule.fromsystem.dest]#Defines the translation part of a translation rule. If a name has matched a corresponding src, it will be translated using this dest part.#
+
+The new names can contain references to groups of the matched name, using a slightly modified regexp syntax. In fact, referenced groups can be part of either the organisation, module or revision part of the original name. So, to reference the groups, you just have to add a letter identifying the part in which the group should be selected: o for organisation, m for module, and r for revision.
+
+For instance, `$o0` matches the whole matched organisation, and `$m0` the whole matched module name. `$o1` matches the first group of the matched organisation.
+
+For details about regexp and groups, see the link:https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html[Pattern class documentation] in the JDK.
+
+== Attributes
+
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|org|the new organisation name|No, defaults to $o0
+|module|the new module name|No, defaults to $m0
+|rev|the new revision|No, defaults to $r0
+|=======
+
+
+== Examples
+
+
+[source, xml]
+----
+
+    <fromsystem>
+      <src org="systemorg2" module="system\-(.+)"/>
+      <dest org="B" module="$m1"/>
+    </fromsystem>
+
+----
+
+Matches modules from `systemorg2` which have a name beginning with `system` followed by a `minus` and anything else, and translate it to organisation `B` and module the part following `system-` of the original name.

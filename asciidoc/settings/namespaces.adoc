@@ -1,0 +1,47 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= namespaces
+
+*Tag:* namespaces
+
+[ivysettings.namespaces]#Namespaces are an advanced feature of Ivy which let you use resolvers in which module names and organisations are not consistent between each other.#
+
+For instance, if you want to use both a Maven 2 repository and an ivyrep, you will face some naming issues. For example, all Apache Commons projects are declared to be part of the organisation __apache__ in ivyrep whereas in Maven 2 ibiblio repository, their organisation is same as the module.
+
+So if you try to use both Maven 2 and ivyrep repositories, you will face some issues like:
+[quote]
+_______
+How do I declare a dependency on commons-lang?
+I have an error while trying to resolve module xxx. It says that it depends on [commons-httpclient commons-httpclient] and that it isn't available.
+_______
+
+Ivy's answer to this issue is called namespaces. In short, you can attach a namespace to each dependency resolver in Ivy, and each namespace defines rules to convert names from the system namespace to the defined namespace itself, and vice versa.
+
+This very powerful feature is thoroughly used in the link:../tutorial/build-repository/advanced.html[build your own repository tutorial], so is the best place to see an example of what can be done with namespaces.
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|link:../settings/namespace{outfilesuffix}[namespace]|defines a new namespace|0..n
+|=======

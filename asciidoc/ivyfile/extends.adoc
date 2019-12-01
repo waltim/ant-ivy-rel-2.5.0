@@ -1,0 +1,56 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+*Tag:* extends *Parent:* link:../ivyfile/info{outfilesuffix}[info]
+
+[*__since 2.2__*]
+
+Identifies an optional parent descriptor for this module. For complicated projects composed of many modules that have common configurations or dependencies, inheritance allows modules to share this information.  Which parts of the parent descriptor are inherited can be controlled with the `extendType` attribute.
+
+Supported `extendType` values are:
+
+[options="header",cols="15%,50%"]
+|=======
+|Value|Description
+|info|Attributes of the link:../ivyfile/info{outfilesuffix}[info] element are inherited from the parent.  When an attribute appears in both child and parent, the child value is used.
+|description|The content of the link:../ivyfile/description{outfilesuffix}[info/description] element is inherited from the parent.
+|configurations|link:../ivyfile/conf{outfilesuffix}[Configurations] defined in the parent descriptor are added to any configurations defined in the child descriptor.
+|dependencies|link:../ivyfile/dependency{outfilesuffix}[Dependencies] defined in the parent descriptor are added to any dependencies defined in the child descriptor.
+|licenses|link:../ivyfile/license{outfilesuffix}[Licenses] defined in the parent descriptor are added to any licenses defined in the child descriptor.
+|all|info, description, configurations, licenses and dependencies from the parent descriptor are merged into the child descriptor.
+|=======
+
+
+
+== Attributes
+
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|organisation|the organisation of the parent module|Yes
+|module|the name of the parent module|Yes
+|revision|the revision of the parent module.  Can be fixed, a dynamic value, or range of revisions; see link:../ivyfile/dependency{outfilesuffix}[dependency] for information on specifying revisions.|Yes
+|extendType|which part(s) of the parent descriptor are inherited.  Valid values are `info`, `description`, `configurations`, `dependencies`, and `all`.|No, default is `all`
+|location|A local filesystem path that should be searched for the parent descriptor.  If the parent descriptor cannot be found at this location, it will be located using dependency resolvers like any normal dependency.
+
+This attribute is intended for development use.  For example, child module descriptors appear in a source control directory with the parent module descriptor at a higher level.  `location` will then contain the relative path to the parent descriptor for use during development builds.
+
+|No, as long as the parent descriptor exists in an Ivy resolver
+|=======

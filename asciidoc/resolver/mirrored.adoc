@@ -1,0 +1,99 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Mirrored resolver
+
+[]
+|=======
+|Tag|mirroredurl
+|Handle latest|yes with HTTP URLs (and Apache server) and with file URLs, no with other URLs
+|Handle publish|no
+|=======
+
+
+[*__since 2.3__*]
+
+[ivysettings.resolvers.mirroredurl]#This resolver can resolve dependencies against several mirrors of the same repository.# From a list of mirror URLs, it will iteratively try to resolve the dependencies against each one.
+
+
+== Attributes
+
+This resolver shares the link:../settings/resolvers{outfilesuffix}#common[common attributes] of standard resolvers.
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|m2compatible|True if this resolver should be Maven 2 compatible, false otherwise|No, defaults to false
+|mirrorListUrl|The URL where to retrieve the list of mirror URLs.|Yes
+|=======
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|ivy|defines a pattern for Ivy files, using the pattern attribute|0..n
+|artifact|defines a pattern for artifacts, using the pattern attribute|1..n
+|=======
+
+
+
+== Example
+
+
+Having the file mavenrepolist.txt content:
+
+[source]
+----
+
+https://repo1.maven.org/maven2/
+http://repo2.maven.org/maven2/
+
+----
+
+And the piece of settings:
+
+[source, xml]
+----
+
+<mirroredurl name="mirrored-maven" m2compatible="true" mirrorListUrl="file:///Users/me/dev/repo/mavenrepolist.txt">
+      <artifact pattern="[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+</mirroredurl>
+
+----
+
+It will resolve first on the `repo1` and if failing it will fall back on `repo2`.
+
+
+'''
+
+
+The mirror list can be retrieved from a geo-location aware URL:
+
+[source, xml]
+----
+
+<mirroredurl name="mirrored-asf" mirrorListUrl="http://www.apache.org/dyn/closer.cgi">
+  <ivy pattern="repo/[organisation]/[module]/[revision]/ivy.xml"/>
+  <artifact pattern="repo/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+</mirroredurl>
+
+----

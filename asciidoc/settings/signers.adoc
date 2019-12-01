@@ -1,0 +1,97 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= signers
+
+*Tag:* signers
+
+[*__since 2.2__*]
+
+[ivysettings.signers]#Defines a list of detached signature generators usable in Ivy. Each generator is identified by its name, given as an attribute.#
+The child tags used to configure the signature generator must be equal to the name of a signature generator type (either built-in or added with the typedef tag).
+
+Ivy supports the following signature generator out of the box:
+
+
+* pgp +
+ generates an OpenPGP compatible ASCII armored detached signature.
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|any signature generator|adds a signature generator to the list of registered generators|1..n
+|=======
+
+
+
+== Built-in Generators
+
+
+
+=== PGP
+
+
+This generator is capable of generating an OpenPGP compatible ASCII armored detached signature.
+
+*Remark:* This generator uses the link:http://www.bouncycastle.org/java.html[BouncyCastle OpenPGP] library. Before this generator can be used, the library and its JCE provider library must be available on Ivy's classpath.
+
+
+
+[options="header",cols="15%,50%,35%"]
+|=======
+|Attribute|Description|Required
+|name|The name of the signature generator.|Yes
+|secring|The location of the secret keyring.|No, defaults to `${user.home}/.gnupg/secring.gpg`
+|keyId|The identifier of the key to use. The keyword `auto` can be used to indicate a key will be selected automatically.|No, defaults to `auto`.
+|password|The password of the private key.|Yes
+|=======
+
+
+
+== Examples
+
+
+[source, xml]
+----
+
+<signers>
+    <pgp name="mypgp" password="my-password"/>
+</signers>
+
+----
+
+Defines a detached signature generator with name 'mypgp' which uses the secret key ring on the default location and automatically selects a private key.
+
+'''
+
+
+[source, xml]
+----
+
+<signers>
+    <pgp name="mypgp" password="my-password" keyId="123ABC45"/>
+</signers>
+
+----
+
+Same as before, but this time the key `123ABC45` is used to generate the detached signature.

@@ -1,0 +1,101 @@
+////
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+////
+
+= Latest strategies
+
+*Tag:* latest-strategies
+
+[ivysettings.latest-strategies]#Defines a list of link:../concept{outfilesuffix}#latest[latest strategies] usable in Ivy.# Each latest strategy is identified by its name, given as an attribute.
+
+The child tag used for the latest strategy must be equal to a name of a latest strategy type (usually added with the `typedef` tag).
+
+The latest strategies which are included in Ivy by default are:
+
+
+* latest-time +
+ compares the revision dates to know which is the latest. While this is often a good strategy in terms of pertinence, its drawback is that it can be slow when dealing with remote repositories. If you use ivyrep, for example, Ivy has to ask the HTTP server for the date of each Ivy file before knowing which is the latest.
+
+* latest-revision +
+ compares the revisions as strings, using an algorithm close to the one used in PHP `version_compare` function.
+This algorithm takes into account the special meaning of some text. For instance, with this strategy, `1.0-dev1` is considered before `1.0-alpha1`, which in turn is before `1.0-rc1`, which is before `1.0`, which is before `1.0.1`.
+
+* latest-lexico +
+ compares the revisions as strings using lexicographic order (the one used by Java string comparison).
+
+
+
+== Child elements
+
+
+[options="header"]
+|=======
+|Element|Description|Cardinality
+|any latest strategy|adds a latest strategy to the list of available strategies|0..n
+|=======
+
+
+
+== latest-revision
+
+[*__since 1.4__*]
+
+The latest-revision can now be configured to handle more words with special meanings than the one defined in PHP `version_compare` function.
+
+Here is an example of how you can do so:
+
+[source, xml]
+----
+
+<latest-strategies>
+  <latest-revision name="mylatest-revision">
+    <specialMeaning name="PRE" value="-2"/>
+    <specialMeaning name="QA" value="4"/>
+    <specialMeaning name="PROD" value="5"/>
+  </latest-revision>
+</latest-strategies>
+
+----
+
+Knowing that the default "special meaning" words are the following:
+
+[source, xml]
+----
+
+    <specialMeaning name="dev" value="-1"/>
+    <specialMeaning name="rc" value="1"/>
+    <specialMeaning name="final" value="2"/>
+
+----
+
+You can even remove or redefine the default special meanings by setting `usedefaultspecialmeanings="false"` on the `latest-revision` tag.
+Example:
+
+[source, xml]
+----
+
+<latest-strategies>
+  <latest-revision name="mylatest-revision" usedefaultspecialmeanings="false">
+    <specialMeaning name="pre" value="-2"/>
+    <specialMeaning name="m" value="1"/>
+    <specialMeaning name="rc" value="2"/>
+    <specialMeaning name="prod" value="3"/>
+  </latest-revision>
+</latest-strategies>
+
+----
