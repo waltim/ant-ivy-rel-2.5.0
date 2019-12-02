@@ -36,11 +36,6 @@ public class OrFilter extends MultiOperatorFilter {
 
     @Override
     public boolean eval(Map<String, String> properties) {
-        for (OSGiFilter filter : getSubFilters()) {
-            if (filter.eval(properties)) {
-                return true;
-            }
-        }
-        return false;
+        return getSubFilters().stream().anyMatch(filter -> filter.eval(properties));
     }
 }

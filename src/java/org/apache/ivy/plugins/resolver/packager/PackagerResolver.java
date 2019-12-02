@@ -71,11 +71,7 @@ public class PackagerResolver extends URLResolver {
     private boolean quiet;
 
     public PackagerResolver() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                clearCache();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(()-> { clearCache();});
     }
 
     protected synchronized void clearCache() {

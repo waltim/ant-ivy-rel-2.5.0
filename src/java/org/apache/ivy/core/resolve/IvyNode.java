@@ -1036,12 +1036,7 @@ public class IvyNode implements Comparable<IvyNode> {
     // /////////////////////////////////////////////////////////////////////////////
 
     boolean canExclude(String rootModuleConf) {
-        for (Caller caller : getCallers(rootModuleConf)) {
-            if (caller.canExclude()) {
-                return true;
-            }
-        }
-        return false;
+        return getCallers(rootModuleConf).stream().anyMatch(caller -> caller.canExclude());
     }
 
     private IvyNode getDirectCallerFor(ModuleId from) {

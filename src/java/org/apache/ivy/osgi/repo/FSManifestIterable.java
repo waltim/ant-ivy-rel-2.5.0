@@ -110,18 +110,10 @@ public class FSManifestIterable extends AbstractFSManifestIterable<File> {
     }
 
     protected List<File> listBundleFiles(File dir) throws IOException {
-        return Arrays.asList(dir.listFiles(new FileFilter() {
-            public boolean accept(File f) {
-                return f.isFile() && bundleFilter.accept(f.getParentFile(), f.getName());
-            }
-        }));
+        return Arrays.asList(dir.listFiles((File f)->{ return f.isFile() && bundleFilter.accept(f.getParentFile(), f.getName());}));
     }
 
     protected List<File> listDirs(File dir) throws IOException {
-        return Arrays.asList(dir.listFiles(new FileFilter() {
-            public boolean accept(File f) {
-                return f.isDirectory() && (dirFilter == null || dirFilter.accept(f.getParentFile(), f.getName()));
-            }
-        }));
+        return Arrays.asList(dir.listFiles((File f)->{ return f.isDirectory() && (dirFilter == null || dirFilter.accept(f.getParentFile(), f.getName()));}));
     }
 }

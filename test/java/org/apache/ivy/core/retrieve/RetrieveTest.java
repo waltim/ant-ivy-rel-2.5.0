@@ -180,11 +180,7 @@ public class RetrieveTest {
             getResolveOptions(new String[] {"*"}));
 
         final List<IvyEvent> events = new ArrayList<>();
-        ivy.getEventManager().addIvyListener(new IvyListener() {
-            public void progress(IvyEvent event) {
-                events.add(event);
-            }
-        });
+        ivy.getEventManager().addIvyListener((IvyEvent event)->{ events.add(event);});
         ModuleDescriptor md = report.getModuleDescriptor();
         String pattern = "build/test/retrieve/[module]/[conf]/[artifact]-[revision].[ext]";
         ivy.retrieve(md.getModuleRevisionId(),

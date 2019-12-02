@@ -92,11 +92,7 @@ public class IvyEventFilter implements Filter<IvyEvent> {
             nameFilter = NoFilter.instance();
         } else {
             final Matcher eventNameMatcher = this.matcher.getMatcher(event);
-            nameFilter = new Filter<IvyEvent>() {
-                public boolean accept(IvyEvent e) {
-                    return eventNameMatcher.matches(e.getName());
-                }
-            };
+            nameFilter = (IvyEvent e)->{ return eventNameMatcher.matches(e.getName());};
         }
         if (isNullOrEmpty(filterExpression)) {
             attFilter = NoFilter.instance();

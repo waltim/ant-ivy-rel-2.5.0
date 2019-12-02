@@ -1337,11 +1337,7 @@ public class DefaultRepositoryCacheManager implements RepositoryCacheManager, Iv
 
             Artifact originalMetadataArtifact = getOriginalMetadataArtifact(moduleArtifact);
             // now download module descriptor and parse it
-            report = download(originalMetadataArtifact, new ArtifactResourceResolver() {
-                public ResolvedResource resolve(Artifact artifact) {
-                    return mdRef;
-                }
-            }, backupDownloader, new CacheDownloadOptions().setListener(options.getListener())
+            report = download(originalMetadataArtifact, (Artifact artifact)->{ return mdRef;}, backupDownloader, new CacheDownloadOptions().setListener(options.getListener())
                     .setForce(true));
             Message.verbose("\t" + report);
 
