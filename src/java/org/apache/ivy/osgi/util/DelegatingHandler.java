@@ -194,11 +194,7 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
         charBuffer.setLength(0);
         if (delegate != null) {
             // we are already delegating, let's continue
-            skipOnError(new SkipOnErrorCallback() {
-                public void call() throws SAXException {
-                    delegate.startElement(uri, localName, n, atts);
-                }
-            });
+            skipOnError(() -> delegate.startElement(uri, localName, n, atts));
         } else {
             if (!started) { // first time called ?
                 // just for the root, check the expected element name
@@ -208,11 +204,7 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
                     throw new SAXException("The root element of the parsed document '" + localName
                             + "' didn't matched the expected one: '" + tagName + "'");
                 }
-                skipOnError(new SkipOnErrorCallback() {
-                    public void call() throws SAXException {
-                        handleAttributes(atts);
-                    }
-                });
+                skipOnError(() -> handleAttributes(atts));
                 started = true;
             } else {
                 if (skip) {
@@ -222,11 +214,7 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
                 // time now to delegate for a new element
                 delegate = saxHandlerMapping.get(localName);
                 if (delegate != null) {
-                    skipOnError(new SkipOnErrorCallback() {
-                        public void call() throws SAXException {
-                            delegate.startElement(uri, localName, n, atts);
-                        }
-                    });
+                    skipOnError(() -> delegate.startElement(uri, localName, n, atts));
                 }
             }
         }
@@ -262,20 +250,12 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
         if (delegate != null) {
             final DelegatingHandler savedDelegate = delegate;
             // we are already delegating, let's continue
-            skipOnError(new SkipOnErrorCallback() {
-                public void call() throws SAXException {
-                    delegate.endElement(uri, localName, n);
-                }
-            });
+            skipOnError(() -> delegate.endElement(uri, localName, n));
             if (delegate == null) {
                 // we just stopped delegating, it means that the child has ended
                 final ChildElementHandler<?> childHandler = childHandlerMapping.get(localName);
                 if (childHandler != null) {
-                    skipOnError(new SkipOnErrorCallback() {
-                        public void call() throws SAXException {
-                            childHandler._childHandled(savedDelegate);
-                        }
-                    });
+                    skipOnError(() -> childHandler._childHandled(savedDelegate));
                 }
             }
         } else {

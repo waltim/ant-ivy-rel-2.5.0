@@ -126,15 +126,12 @@ public class PomReader {
         InputSource source = new InputSource(stream);
         source.setSystemId(XMLHelper.toSystemId(descriptorURL));
         try {
-            Document pomDomDoc = XMLHelper.parseToDom(source, new EntityResolver() {
-                public InputSource resolveEntity(String publicId, String systemId)
-                        throws SAXException, IOException {
-                    if (systemId != null && systemId.endsWith("m2-entities.ent")) {
-                        return new InputSource(
-                                PomReader.class.getResourceAsStream("m2-entities.ent"));
-                    }
-                    return null;
+            Document pomDomDoc = XMLHelper.parseToDom(source, (publicId, systemId) -> {
+                if (systemId != null && systemId.endsWith("m2-entities.ent")) {
+                    return new InputSource(
+                            PomReader.class.getResourceAsStream("m2-entities.ent"));
                 }
+                return null;
             });
             projectElement = pomDomDoc.getDocumentElement();
             if (!PROJECT.equals(projectElement.getNodeName())

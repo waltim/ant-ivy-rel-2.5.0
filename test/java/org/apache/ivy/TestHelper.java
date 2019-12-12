@@ -378,12 +378,9 @@ public class TestHelper {
         server.createContext(webAppContext, handler);
         // start the server
         server.start();
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                final int delaySeconds = 0;
-                server.stop(delaySeconds);
-            }
+        return () -> {
+            final int delaySeconds = 0;
+            server.stop(delaySeconds);
         };
     }
 
@@ -433,12 +430,9 @@ public class TestHelper {
         context.getFilters().add(new AuthFilter(authenticator));
         // start the server
         server.start();
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                final int delaySeconds = 0;
-                server.stop(delaySeconds);
-            }
+        return () -> {
+            final int delaySeconds = 0;
+            server.stop(delaySeconds);
         };
     }
 

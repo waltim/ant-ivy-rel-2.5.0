@@ -471,20 +471,18 @@ public class RetrieveEngine {
      * @return Comparator&lt;ArtifactDownloadReport&gt;
      */
     private Comparator<ArtifactDownloadReport> getConflictResolvingPolicy() {
-        return new Comparator<ArtifactDownloadReport>() {
-            // younger conflict resolving policy
-            public int compare(ArtifactDownloadReport o1, ArtifactDownloadReport o2) {
-                Artifact a1 = o1.getArtifact();
-                Artifact a2 = o2.getArtifact();
-                if (a1.getPublicationDate().after(a2.getPublicationDate())) {
-                    // a1 is after a2 <=> a1 is younger than a2 <=> a1 wins the conflict battle
-                    return +1;
-                } else if (a1.getPublicationDate().before(a2.getPublicationDate())) {
-                    // a1 is before a2 <=> a2 is younger than a1 <=> a2 wins the conflict battle
-                    return -1;
-                } else {
-                    return 0;
-                }
+        // younger conflict resolving policy
+        return (o1, o2) -> {
+            Artifact a1 = o1.getArtifact();
+            Artifact a2 = o2.getArtifact();
+            if (a1.getPublicationDate().after(a2.getPublicationDate())) {
+                // a1 is after a2 <=> a1 is younger than a2 <=> a1 wins the conflict battle
+                return +1;
+            } else if (a1.getPublicationDate().before(a2.getPublicationDate())) {
+                // a1 is before a2 <=> a2 is younger than a1 <=> a2 wins the conflict battle
+                return -1;
+            } else {
+                return 0;
             }
         };
     }

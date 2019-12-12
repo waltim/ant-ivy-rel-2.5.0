@@ -114,17 +114,15 @@ public class VersionRangeMatcher extends AbstractVersionMatcher {
         }
     }
 
-    private final Comparator<ModuleRevisionId> comparator = new Comparator<ModuleRevisionId>() {
-        public int compare(ModuleRevisionId o1, ModuleRevisionId o2) {
-            if (o1.equals(o2)) {
-                return 0;
-            }
-            ArtifactInfo art1 = new MRIDArtifactInfo(o1);
-            ArtifactInfo art2 = new MRIDArtifactInfo(o2);
-            ArtifactInfo art = getLatestStrategy().findLatest(new ArtifactInfo[] {art1, art2},
-                null);
-            return art == art1 ? -1 : 1;
+    private final Comparator<ModuleRevisionId> comparator = (o1, o2) -> {
+        if (o1.equals(o2)) {
+            return 0;
         }
+        ArtifactInfo art1 = new MRIDArtifactInfo(o1);
+        ArtifactInfo art2 = new MRIDArtifactInfo(o2);
+        ArtifactInfo art = getLatestStrategy().findLatest(new ArtifactInfo[] {art1, art2},
+            null);
+        return art == art1 ? -1 : 1;
     };
 
     private LatestStrategy latestStrategy;

@@ -367,9 +367,7 @@ public abstract class BasicResolver extends AbstractResolver {
                 ivyRef.getResource());
 
         cacheManager.originalToCachedModuleDescriptor(this, ivyRef, requestedMetadataArtifact, rmr,
-            new ModuleDescriptorWriter() {
-                public void write(ResolvedResource originalMdResource, ModuleDescriptor md,
-                        File src, File dest) throws IOException, ParseException {
+                (originalMdResource, md, src, dest) -> {
                     if (originalMdResource == null) {
                         // a basic ivy file is written containing default data
                         XmlModuleDescriptorWriter.write(md, dest);
@@ -382,8 +380,7 @@ public abstract class BasicResolver extends AbstractResolver {
                             dest.setLastModified(repLastModified);
                         }
                     }
-                }
-            });
+                });
     }
 
     private void checkNotConvertedExclusionRule(ModuleDescriptor systemMd, ResolvedResource ivyRef,
@@ -543,35 +540,30 @@ public abstract class BasicResolver extends AbstractResolver {
     }
 
     protected ResourceMDParser getRMDParser(final DependencyDescriptor dd, final ResolveData data) {
-        return new ResourceMDParser() {
-            public MDResolvedResource parse(Resource resource, String rev) {
-                try {
-                    ResolvedModuleRevision rmr = BasicResolver.this.parse(new ResolvedResource(
-                            resource, rev), dd, data);
-                    if (rmr != null) {
-                        return new MDResolvedResource(resource, rev, rmr);
-                    }
-                } catch (ParseException e) {
-                    Message.warn("Failed to parse the file '" + resource + "'", e);
+        return (resource, rev) -> {
+            try {
+                ResolvedModuleRevision rmr = BasicResolver.this.parse(new ResolvedResource(
+                        resource, rev), dd, data);
+                if (rmr != null) {
+                    return new MDResolvedResource(resource, rev, rmr);
                 }
-                return null;
+            } catch (ParseException e) {
+                Message.warn("Failed to parse the file '" + resource + "'", e);
             }
-
+            return null;
         };
     }
 
     protected ResourceMDParser getDefaultRMDParser(final ModuleId mid) {
-        return new ResourceMDParser() {
-            public MDResolvedResource parse(Resource resource, String rev) {
-                DefaultModuleDescriptor md = DefaultModuleDescriptor
-                        .newDefaultInstance(new ModuleRevisionId(mid, rev));
-                MetadataArtifactDownloadReport madr = new MetadataArtifactDownloadReport(
-                        md.getMetadataArtifact());
-                madr.setDownloadStatus(DownloadStatus.NO);
-                madr.setSearched(true);
-                return new MDResolvedResource(resource, rev, new ResolvedModuleRevision(
-                        BasicResolver.this, BasicResolver.this, md, madr, isForce()));
-            }
+        return (resource, rev) -> {
+            DefaultModuleDescriptor md = DefaultModuleDescriptor
+                    .newDefaultInstance(new ModuleRevisionId(mid, rev));
+            MetadataArtifactDownloadReport madr = new MetadataArtifactDownloadReport(
+                    md.getMetadataArtifact());
+            madr.setDownloadStatus(DownloadStatus.NO);
+            madr.setSearched(true);
+            return new MDResolvedResource(resource, rev, new ResolvedModuleRevision(
+                    BasicResolver.this, BasicResolver.this, md, madr, isForce()));
         };
     }
 
@@ -860,8 +852,7 @@ public abstract class BasicResolver extends AbstractResolver {
     public ArtifactDownloadReport download(final ArtifactOrigin origin, DownloadOptions options) {
         Checks.checkNotNull(origin, "origin");
         return getRepositoryCacheManager().download(origin.getArtifact(),
-            new ArtifactResourceResolver() {
-                public ResolvedResource resolve(Artifact artifact) {
+                artifact -> {
                     try {
                         Resource resource = getResource(origin.getLocation());
                         if (resource != null) {
@@ -872,8 +863,7 @@ public abstract class BasicResolver extends AbstractResolver {
                         Message.debug(e);
                     }
                     return null;
-                }
-            }, downloader, getCacheDownloadOptions(options));
+                }, downloader, getCacheDownloadOptions(options));
     }
 
     protected abstract Resource getResource(String source) throws IOException;
@@ -1128,33 +1118,29 @@ public abstract class BasicResolver extends AbstractResolver {
         this.checksums = checksums;
     }
 
-    private final ArtifactResourceResolver artifactResourceResolver = new ArtifactResourceResolver() {
-        public ResolvedResource resolve(Artifact artifact) {
-            artifact = fromSystem(artifact);
-            return getArtifactRef(artifact, null);
-        }
+    private final ArtifactResourceResolver artifactResourceResolver = artifact -> {
+        artifact = fromSystem(artifact);
+        return getArtifactRef(artifact, null);
     };
 
-    private final ResourceDownloader downloader = new ResourceDownloader() {
-        public void download(Artifact artifact, Resource resource, File dest) throws IOException {
-            if (dest.exists()) {
-                dest.delete();
-            }
-            File part = new File(dest.getAbsolutePath() + ".part");
-            if (resource.getName().equals(String.valueOf(artifact.getUrl()))) {
-                if (part.getParentFile() != null) {
-                    part.getParentFile().mkdirs();
-                }
-                extartifactrep.get(resource.getName(), part);
-            } else {
-                getAndCheck(resource, part);
-            }
-            if (!part.renameTo(dest)) {
-                throw new IOException("impossible to move part file to definitive one: " + part
-                        + " -> " + dest);
-            }
-
+    private final ResourceDownloader downloader = (artifact, resource, dest) -> {
+        if (dest.exists()) {
+            dest.delete();
         }
+        File part = new File(dest.getAbsolutePath() + ".part");
+        if (resource.getName().equals(String.valueOf(artifact.getUrl()))) {
+            if (part.getParentFile() != null) {
+                part.getParentFile().mkdirs();
+            }
+            extartifactrep.get(resource.getName(), part);
+        } else {
+            getAndCheck(resource, part);
+        }
+        if (!part.renameTo(dest)) {
+            throw new IOException("impossible to move part file to definitive one: " + part
+                    + " -> " + dest);
+        }
+
     };
 
 }
