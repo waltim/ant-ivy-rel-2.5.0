@@ -306,27 +306,25 @@ public class Ivy {
                         resolveEngine);
             }
 
-            eventManager.addTransferListener(new TransferListener() {
-                public void transferProgress(TransferEvent evt) {
-                    ResolveData resolve;
-                    switch (evt.getEventType()) {
-                        case TransferEvent.TRANSFER_PROGRESS:
-                            resolve = IvyContext.getContext().getResolveData();
-                            if (resolve == null
-                                    || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
-                                Message.progress();
-                            }
-                            break;
-                        case TransferEvent.TRANSFER_COMPLETED:
-                            resolve = IvyContext.getContext().getResolveData();
-                            if (resolve == null
-                                    || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
-                                Message.endProgress(" (" + (evt.getTotalLength() / KILO) + "kB)");
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+            eventManager.addTransferListener((TransferEvent evt) -> {
+                ResolveData resolve;
+                switch (evt.getEventType()) {
+                    case TransferEvent.TRANSFER_PROGRESS:
+                        resolve = IvyContext.getContext().getResolveData();
+                        if (resolve == null
+                                || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
+                            Message.progress();
+                        }
+                        break;
+                    case TransferEvent.TRANSFER_COMPLETED:
+                        resolve = IvyContext.getContext().getResolveData();
+                        if (resolve == null
+                                || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
+                            Message.endProgress(" (" + (evt.getTotalLength() / KILO) + "kB)");
+                        }
+                        break;
+                    default:
+                        break;
                 }
             });
 

@@ -135,11 +135,7 @@ public class DefaultResolutionCacheManager implements ResolutionCacheManager, Iv
     public File[] getConfigurationResolveReportsInCache(final String resolveId) {
         final String prefix = resolveId + "-";
         final String suffix = ".xml";
-        return getResolutionCacheRoot().listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.startsWith(prefix) && name.endsWith(suffix);
-            }
-        });
+        return getResolutionCacheRoot().listFiles((File dir, String name1) -> name1.startsWith(prefix) && name1.endsWith(suffix));
     }
 
     public ModuleDescriptor getResolvedModuleDescriptor(ModuleRevisionId mrid)

@@ -20,11 +20,7 @@ package org.apache.ivy.util;
 import java.io.File;
 
 public interface FileResolver {
-    FileResolver DEFAULT = new FileResolver() {
-        public File resolveFile(String path, String filename) {
-            return new File(path);
-        }
-    };
+    FileResolver DEFAULT = (String path, String filename) -> new File(path);
 
     /**
      * Return the canonical form of a path, or raise an {@link IllegalArgumentException} if the path
