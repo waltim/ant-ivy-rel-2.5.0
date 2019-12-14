@@ -92,11 +92,8 @@ public class IvyEventFilter implements Filter<IvyEvent> {
             nameFilter = NoFilter.instance();
         } else {
             final Matcher eventNameMatcher = this.matcher.getMatcher(event);
-            nameFilter = new Filter<IvyEvent>() {
-                public boolean accept(IvyEvent e) {
-                    return eventNameMatcher.matches(e.getName());
-                }
-            };
+            nameFilter = (IvyEvent e)->{ return eventNameMatcher.matches(e.getName());
+                };
         }
         if (isNullOrEmpty(filterExpression)) {
             attFilter = NoFilter.instance();
@@ -131,9 +128,7 @@ public class IvyEventFilter implements Filter<IvyEvent> {
                     for (String value : splitToArray(filterExpression.substring(index + 1))) {
                         matchers.add(matcher.getMatcher(value));
                     }
-                    return new Filter<IvyEvent>() {
-                        public boolean accept(IvyEvent e) {
-                            String val = e.getAttributes().get(attname);
+                    return (IvyEvent e)->{ String val = e.getAttributes().get(attname);
                             if (val == null) {
                                 return false;
                             }
@@ -142,9 +137,7 @@ public class IvyEventFilter implements Filter<IvyEvent> {
                                     return true;
                                 }
                             }
-                            return false;
-                        }
-                    };
+                            return false;};
                 }
             } else {
                 return new OrFilter<>(parseExpression(filterExpression.substring(0, index)),

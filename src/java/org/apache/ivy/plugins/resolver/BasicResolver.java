@@ -860,9 +860,7 @@ public abstract class BasicResolver extends AbstractResolver {
     public ArtifactDownloadReport download(final ArtifactOrigin origin, DownloadOptions options) {
         Checks.checkNotNull(origin, "origin");
         return getRepositoryCacheManager().download(origin.getArtifact(),
-            new ArtifactResourceResolver() {
-                public ResolvedResource resolve(Artifact artifact) {
-                    try {
+            (Artifact artifact)->{ try {
                         Resource resource = getResource(origin.getLocation());
                         if (resource != null) {
                             String revision = origin.getArtifact().getModuleRevisionId().getRevision();
@@ -871,9 +869,7 @@ public abstract class BasicResolver extends AbstractResolver {
                     } catch (IOException e) {
                         Message.debug(e);
                     }
-                    return null;
-                }
-            }, downloader, getCacheDownloadOptions(options));
+                    return null;}, downloader, getCacheDownloadOptions(options));
     }
 
     protected abstract Resource getResource(String source) throws IOException;
@@ -1128,12 +1124,8 @@ public abstract class BasicResolver extends AbstractResolver {
         this.checksums = checksums;
     }
 
-    private final ArtifactResourceResolver artifactResourceResolver = new ArtifactResourceResolver() {
-        public ResolvedResource resolve(Artifact artifact) {
-            artifact = fromSystem(artifact);
-            return getArtifactRef(artifact, null);
-        }
-    };
+    private final ArtifactResourceResolver artifactResourceResolver = (Artifact artifact)->{ artifact = fromSystem(artifact);
+            return getArtifactRef(artifact, null);};
 
     private final ResourceDownloader downloader = new ResourceDownloader() {
         public void download(Artifact artifact, Resource resource, File dest) throws IOException {

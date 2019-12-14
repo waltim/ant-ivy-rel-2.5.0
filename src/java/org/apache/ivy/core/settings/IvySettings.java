@@ -944,20 +944,14 @@ public class IvySettings implements SortEngineSettings, PublishEngineSettings, P
     }
 
     public synchronized String getResolverName(ModuleRevisionId mrid) {
-        ModuleSettings ms = moduleSettings.getRule(mrid, new Filter<ModuleSettings>() {
-            public boolean accept(ModuleSettings o) {
-                return o.getResolverName() != null;
-            }
-        });
+        ModuleSettings ms = moduleSettings.getRule(mrid, (ModuleSettings o)->{ return o.getResolverName() != null;
+            });
         return ms == null ? defaultResolverName : ms.getResolverName();
     }
 
     public synchronized String getDefaultBranch(ModuleId moduleId) {
-        ModuleSettings ms = moduleSettings.getRule(moduleId, new Filter<ModuleSettings>() {
-            public boolean accept(ModuleSettings o) {
-                return o.getBranch() != null;
-            }
-        });
+        ModuleSettings ms = moduleSettings.getRule(moduleId, (ModuleSettings o)->{ return o.getBranch() != null;
+            });
         return ms == null ? getDefaultBranch() : ms.getBranch();
     }
 
@@ -970,11 +964,8 @@ public class IvySettings implements SortEngineSettings, PublishEngineSettings, P
     }
 
     public synchronized ConflictManager getConflictManager(ModuleId moduleId) {
-        ModuleSettings ms = moduleSettings.getRule(moduleId, new Filter<ModuleSettings>() {
-            public boolean accept(ModuleSettings o) {
-                return o.getConflictManager() != null;
-            }
-        });
+        ModuleSettings ms = moduleSettings.getRule(moduleId, (ModuleSettings o)->{ return o.getConflictManager() != null;
+            });
         if (ms == null) {
             return getDefaultConflictManager();
         } else {
@@ -988,11 +979,8 @@ public class IvySettings implements SortEngineSettings, PublishEngineSettings, P
     }
 
     public synchronized String getResolveMode(ModuleId moduleId) {
-        ModuleSettings ms = moduleSettings.getRule(moduleId, new Filter<ModuleSettings>() {
-            public boolean accept(ModuleSettings o) {
-                return o.getResolveMode() != null;
-            }
-        });
+        ModuleSettings ms = moduleSettings.getRule(moduleId, (ModuleSettings o)->{ return o.getResolveMode() != null;
+            });
         return ms == null ? getDefaultResolveMode() : ms.getResolveMode();
     }
 

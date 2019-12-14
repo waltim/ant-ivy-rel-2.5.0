@@ -165,16 +165,12 @@ public class VsftpRepository extends AbstractRepository {
                     : new File(destDir, srcName);
 
             final IOException[] ex = new IOException[1];
-            Thread get = new IvyThread() {
-                public void run() {
-                    initContext();
+            Thread get = ()-> { initContext();
                     try {
                         sendCommand("get " + source, getExpectedDownloadMessage(source, to), 0);
                     } catch (IOException e) {
                         ex[0] = e;
-                    }
-                }
-            };
+                    }};
             get.start();
 
             long prevLength = 0;
@@ -385,9 +381,7 @@ public class VsftpRepository extends AbstractRepository {
         final StringBuilder response = new StringBuilder();
         final IOException[] exc = new IOException[1];
         final boolean[] done = new boolean[1];
-        Runnable r = new Runnable() {
-            public void run() {
-                synchronized (VsftpRepository.this) {
+        Runnable r = ()-> { synchronized (VsftpRepository.this) {
                     try {
                         int c;
                         boolean getPrompt = false;
@@ -447,8 +441,7 @@ public class VsftpRepository extends AbstractRepository {
                         VsftpRepository.this.notify();
                     }
                 }
-            }
-        };
+            };
         Thread reader = null;
         if (timeout == 0) {
             r.run();
@@ -506,9 +499,7 @@ public class VsftpRepository extends AbstractRepository {
                 readResponse(false); // waits for first prompt
 
                 if (reuseConnection > 0) {
-                    connectionCleaner = new IvyThread() {
-                        public void run() {
-                            initContext();
+                    connectionCleaner = ()-> { initContext();
                             try {
                                 long sleep = REUSE_CONNECTION_SLEEP_TIME;
                                 while (in != null && sleep > 0) {
@@ -522,9 +513,7 @@ public class VsftpRepository extends AbstractRepository {
                             } catch (InterruptedException e) {
                                 // nothing to do
                             }
-                            disconnect();
-                        }
-                    };
+                            disconnect();};
                     connectionCleaner.start();
                 }
 
@@ -557,9 +546,7 @@ public class VsftpRepository extends AbstractRepository {
         err = new InputStreamReader(process.getErrorStream());
         out = new PrintWriter(process.getOutputStream());
 
-        errorsReader = new IvyThread() {
-            public void run() {
-                initContext();
+        errorsReader = ()-> { initContext();
                 int c;
                 try {
                     // CheckStyle:InnerAssignment OFF
@@ -570,9 +557,7 @@ public class VsftpRepository extends AbstractRepository {
                     // CheckStyle:InnerAssignment ON
                 } catch (IOException e) {
                     // nothing to do
-                }
-            }
-        };
+                }};
         errorsReader.start();
     }
 

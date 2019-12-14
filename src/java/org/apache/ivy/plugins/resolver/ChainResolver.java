@@ -280,12 +280,7 @@ public class ChainResolver extends AbstractResolver {
 
     @Override
     public boolean exists(Artifact artifact) {
-        for (DependencyResolver resolver : chain) {
-            if (resolver.exists(artifact)) {
-                return true;
-            }
-        }
-        return false;
+        return chain.stream().anyMatch(resolver -> resolver.exists(artifact));
     }
 
     @Override

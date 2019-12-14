@@ -306,9 +306,7 @@ public class Ivy {
                         resolveEngine);
             }
 
-            eventManager.addTransferListener(new TransferListener() {
-                public void transferProgress(TransferEvent evt) {
-                    ResolveData resolve;
+            eventManager.addTransferListener((TransferEvent evt)->{ ResolveData resolve;
                     switch (evt.getEventType()) {
                         case TransferEvent.TRANSFER_PROGRESS:
                             resolve = IvyContext.getContext().getResolveData();
@@ -326,9 +324,7 @@ public class Ivy {
                             break;
                         default:
                             break;
-                    }
-                }
-            });
+                    }});
 
             bound = true;
         } finally {

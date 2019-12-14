@@ -35,11 +35,8 @@ public class CCFilter implements IFilter {
         }
 
         List<String> result = new ArrayList<>(Arrays.asList(values));
-        CollectionUtils.filter(result, new Predicate<String>() {
-            public boolean evaluate(String string) {
-                return string != null && string.startsWith(prefix);
-            }
-        });
+        CollectionUtils.filter(result, (String string)->{ return string != null && string.startsWith(prefix);
+            });
         return result.toArray(new String[result.size()]);
     }
 }

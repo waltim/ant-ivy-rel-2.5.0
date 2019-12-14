@@ -33,7 +33,7 @@ import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleId;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.core.module.id.ModuleRevisionId;import java.util.stream.Collectors;
 
 public class IvyNodeCallers {
     public static class Caller {
@@ -237,12 +237,7 @@ public class IvyNodeCallers {
     public Caller[] getAllRealCallers() {
         Set<Caller> all = new HashSet<>();
         for (Map<ModuleRevisionId, Caller> callers : callersByRootConf.values()) {
-            for (Caller c : callers.values()) {
-                if (c.isRealCaller()) {
-                    all.add(c);
-                }
-            }
-        }
+            all  = callers.values().stream().filter(c -> c.isRealCaller()).collect(Collectors.toList());}
         return all.toArray(new Caller[all.size()]);
     }
 

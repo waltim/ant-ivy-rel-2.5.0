@@ -25,11 +25,8 @@ import java.util.Set;
 final class DeleteOnExitHook {
 
     static {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                runHook();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(()-> { runHook();
+            });
     }
 
     private static final Set<File> files = new LinkedHashSet<>();

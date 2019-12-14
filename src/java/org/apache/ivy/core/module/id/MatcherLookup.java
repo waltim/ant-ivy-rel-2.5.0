@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.plugins.matcher.ExactPatternMatcher;
 import org.apache.ivy.plugins.matcher.MapMatcher;
-import org.apache.ivy.plugins.matcher.PatternMatcher;
+import org.apache.ivy.plugins.matcher.PatternMatcher;import java.util.stream.Collectors;
 
 /**
  * This class targets to speed up lookup for exact pattern matcher by keys, which are created with
@@ -95,32 +95,17 @@ public class MatcherLookup {
         List<MapMatcher> matchers = new ArrayList<>();
         // Step 1: find matchers from nonExactMatchers list
         if (!nonExactMatchers.isEmpty()) {
-            for (MapMatcher matcher : nonExactMatchers) {
-                if (matcher.matches(attrs)) {
-                    matchers.add(matcher);
-                }
-            }
-        }
+            matchers  = nonExactMatchers.stream().filter(matcher -> matcher.matches(attrs)).collect(Collectors.toList());}
         // Step 2: find matchers from exactMatchers list of key
         String key = key(attrs);
         List<MapMatcher> exactMatchers = lookup.get(key);
         if (exactMatchers != null) {
-            for (MapMatcher matcher : exactMatchers) {
-                if (matcher.matches(attrs)) {
-                    matchers.add(matcher);
-                }
-            }
-        }
+            matchers  = exactMatchers.stream().filter(matcher -> matcher.matches(attrs)).collect(Collectors.toList());}
         // Step 3: (iff key != DEFAULT) find matchers from exactMatchers of DEFAULT
         if (!DEFAULT.equals(key)) {
             List<MapMatcher> defaultExactMatchers = lookup.get(DEFAULT);
             if (defaultExactMatchers != null) {
-                for (MapMatcher matcher : defaultExactMatchers) {
-                    if (matcher.matches(attrs)) {
-                        matchers.add(matcher);
-                    }
-                }
-            }
+                matchers  = defaultExactMatchers.stream().filter(matcher -> matcher.matches(attrs)).collect(Collectors.toList());}
         }
         return matchers;
     }

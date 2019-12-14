@@ -90,12 +90,7 @@ public class ResolveReport {
     }
 
     public boolean hasError() {
-        for (ConfigurationResolveReport report : confReports.values()) {
-            if (report.hasError()) {
-                return true;
-            }
-        }
-        return false;
+        return confReports.values().stream().anyMatch(report -> report.hasError());
     }
 
     public void output(ReportOutputter[] outputters, ResolutionCacheManager cacheMgr,
@@ -189,12 +184,7 @@ public class ResolveReport {
      * @return boolean
      */
     public boolean hasChanged() {
-        for (ConfigurationResolveReport report : confReports.values()) {
-            if (report.hasChanged()) {
-                return true;
-            }
-        }
-        return false;
+        return confReports.values().stream().anyMatch(report -> report.hasChanged());
     }
 
     public void setProblemMessages(List<String> problems) {

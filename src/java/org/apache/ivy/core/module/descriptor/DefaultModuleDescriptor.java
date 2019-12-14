@@ -656,12 +656,7 @@ public class DefaultModuleDescriptor implements ModuleDescriptor {
     }
 
     public boolean isNamespaceUseful() {
-        for (DependencyDescriptor dd : dependencies) {
-            if (dd.getAllExcludeRules().length > 0) {
-                return true;
-            }
-        }
-        return false;
+        return dependencies.stream().anyMatch(dd -> dd.getAllExcludeRules().length > 0);
     }
 
     public void setNamespace(Namespace ns) {
