@@ -1005,18 +1005,20 @@ public final class XmlModuleDescriptorUpdater {
                 justOpen = null;
             }
 
-            for (Map.Entry<ModuleRevisionId, List<InheritableItem>> entry : inheritedItems
-                    .entrySet()) {
-                if (justOpen != null) {
-                    out.println(">");
-                    justOpen = null; // helps endElement() decide how to write close tags
-                }
-                writeInheritanceComment(itemName, entry.getKey());
-                for (InheritableItem item : entry.getValue()) {
+            inheritedItems
+                    .entrySet().stream().map((entry) -> {
+                        if (justOpen != null) {
+                            out.println(">");
+                            justOpen = null; // helps endElement() decide how to write close tags
+                        }
+                        writeInheritanceComment(itemName, entry.getKey());
+                return entry;
+            }).forEachOrdered((entry) -> {
+                entry.getValue().forEach((item) -> {
                     out.print(getIndent());
                     printer.print(merged, item, out);
-                }
-            }
+                });
+            });
 
             if (hasItems) {
                 if (includeContainer) {

@@ -71,9 +71,9 @@ public class ManifestHeaderValue {
             return Collections.emptyList();
         }
         List<String> list = new ArrayList<>();
-        for (ManifestHeaderElement element : getElements()) {
+        getElements().forEach((element) -> {
             list.addAll(element.getValues());
-        }
+        });
         return list;
     }
 
@@ -383,22 +383,20 @@ public class ManifestHeaderValue {
         if (other.elements.size() != elements.size()) {
             return false;
         }
-        for (ManifestHeaderElement element : elements) {
-            if (!other.elements.contains(element)) {
-                return false;
-            }
+        if (!elements.stream().noneMatch((element) -> (!other.elements.contains(element)))) {
+            return false;
         }
         return true;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (ManifestHeaderElement element : elements) {
+        elements.forEach((element) -> {
             if (sb.length() > 0) {
                 sb.append(",");
             }
             sb.append(element.toString());
-        }
+        });
         return sb.toString();
     }
 

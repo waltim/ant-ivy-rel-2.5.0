@@ -255,9 +255,9 @@ public class IvyRepResolver extends URLResolver {
         tokenValues.put(IvyPatternHelper.ORGANISATION_KEY, org.getOrganisation());
         Collection<String> names = findIvyNames(tokenValues, IvyPatternHelper.MODULE_KEY);
         List<ModuleEntry> ret = new ArrayList<>(names.size());
-        for (String name : names) {
+        names.forEach((name) -> {
             ret.add(new ModuleEntry(org, name));
-        }
+        });
         return ret.toArray(new ModuleEntry[names.size()]);
     }
 

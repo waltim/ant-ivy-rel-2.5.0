@@ -46,10 +46,10 @@ public class Capability {
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append(name);
-        for (CapabilityProperty p : properties) {
+        properties.forEach((p) -> {
             buffer.append(" ");
             buffer.append(p);
-        }
+        });
         return buffer.toString();
     }
 }

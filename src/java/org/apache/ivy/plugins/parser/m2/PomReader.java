@@ -126,15 +126,12 @@ public class PomReader {
         InputSource source = new InputSource(stream);
         source.setSystemId(XMLHelper.toSystemId(descriptorURL));
         try {
-            Document pomDomDoc = XMLHelper.parseToDom(source, new EntityResolver() {
-                public InputSource resolveEntity(String publicId, String systemId)
-                        throws SAXException, IOException {
-                    if (systemId != null && systemId.endsWith("m2-entities.ent")) {
-                        return new InputSource(
-                                PomReader.class.getResourceAsStream("m2-entities.ent"));
-                    }
-                    return null;
+            Document pomDomDoc = XMLHelper.parseToDom(source, (String publicId, String systemId) -> {
+                if (systemId != null && systemId.endsWith("m2-entities.ent")) {
+                    return new InputSource(
+                            PomReader.class.getResourceAsStream("m2-entities.ent"));
                 }
+                return null;
             });
             projectElement = pomDomDoc.getDocumentElement();
             if (!PROJECT.equals(projectElement.getNodeName())
@@ -153,15 +150,15 @@ public class PomReader {
         // Both environment and system properties take precedence over properties set in
         // pom.xml. So we pre-populate our properties with the environment and system properties
         // here
-        for (final Map.Entry<String, String> envEntry : System.getenv().entrySet()) {
+        System.getenv().entrySet().forEach((envEntry) -> {
             // Maven let's users use "env." prefix for environment variables
             this.setProperty("env." + envEntry.getKey(), envEntry.getValue());
-        }
+        });
         // add system properties
         final Properties sysProps = System.getProperties();
-        for (final String sysProp : sysProps.stringPropertyNames()) {
+        sysProps.stringPropertyNames().forEach((sysProp) -> {
             this.setProperty(sysProp, sysProps.getProperty(sysProp));
-        }
+        });
     }
 
     public boolean hasParent() {
@@ -262,16 +259,11 @@ public class PomReader {
         }
         licenses.normalize();
         List<License> lics = new ArrayList<>();
-        for (Element license : getAllChilds(licenses)) {
-            if (LICENSE.equals(license.getNodeName())) {
-                String name = getFirstChildText(license, LICENSE_NAME);
-                String url = getFirstChildText(license, LICENSE_URL);
-
-                if (name == null && url == null) {
-                    // move to next license
-                    continue;
-                }
-
+        getAllChilds(licenses).stream().filter((license) -> (LICENSE.equals(license.getNodeName()))).forEachOrdered((license) -> {
+            String name = getFirstChildText(license, LICENSE_NAME);
+            // move to next license
+            String url = getFirstChildText(license, LICENSE_URL);
+            if (!(name == null && url == null)) {
                 if (name == null) {
                     // The license name is required in Ivy but not in a POM!
                     name = "Unknown License";
@@ -279,7 +271,7 @@ public class PomReader {
 
                 lics.add(new License(name, url));
             }
-        }
+        });
         return lics.toArray(new License[lics.size()]);
     }
 
@@ -458,9 +450,9 @@ public class PomReader {
         }
         propsEl.normalize();
         final Map<String, String> props = new HashMap<>();
-        for (final Element prop : getAllChilds(propsEl)) {
+        getAllChilds(propsEl).forEach((prop) -> {
             props.put(prop.getNodeName(), getTextContent(prop));
-        }
+        });
         return props;
     }
 

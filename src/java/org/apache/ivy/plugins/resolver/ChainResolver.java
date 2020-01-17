@@ -124,9 +124,9 @@ public class ChainResolver extends AbstractResolver {
                 }
             } else {
                 StringBuilder err = new StringBuilder();
-                for (Exception ex : errors) {
+                errors.forEach((ex) -> {
                     err.append("\t").append(StringUtils.getErrorMessage(ex)).append("\n");
-                }
+                });
                 err.setLength(err.length() - 1);
                 throw new RuntimeException("several problems occurred while resolving " + dd
                         + ":\n" + err);
@@ -182,27 +182,26 @@ public class ChainResolver extends AbstractResolver {
     @Override
     public Map<String, String>[] listTokenValues(String[] tokens, Map<String, Object> criteria) {
         Set<Map<String, String>> result = new HashSet<>();
-        for (DependencyResolver resolver : chain) {
-            Map<String, String>[] temp = resolver.listTokenValues(tokens,
-                    new HashMap<>(criteria));
-            result.addAll(Arrays.asList(temp));
-        }
+        chain.stream().map((resolver) -> resolver.listTokenValues(tokens,
+                new HashMap<>(criteria))).forEachOrdered((temp) -> {
+                    result.addAll(Arrays.asList(temp));
+        });
 
         return result.toArray(new Map[result.size()]);
     }
 
     @Override
     public void reportFailure() {
-        for (DependencyResolver resolver : chain) {
+        chain.forEach((resolver) -> {
             resolver.reportFailure();
-        }
+        });
     }
 
     @Override
     public void reportFailure(Artifact art) {
-        for (DependencyResolver resolver : chain) {
+        chain.forEach((resolver) -> {
             resolver.reportFailure(art);
-        }
+        });
     }
 
     public DownloadReport download(Artifact[] artifacts, DownloadOptions options) {
@@ -221,11 +220,12 @@ public class ChainResolver extends AbstractResolver {
                 }
             }
         }
-        for (Artifact art : artifactsToDownload) {
-            ArtifactDownloadReport adr = new ArtifactDownloadReport(art);
+        artifactsToDownload.stream().map((art) -> new ArtifactDownloadReport(art)).map((adr) -> {
             adr.setDownloadStatus(DownloadStatus.FAILED);
+            return adr;
+        }).forEachOrdered((adr) -> {
             report.addArtifactReport(adr);
-        }
+        });
         return report;
     }
 
@@ -273,17 +273,15 @@ public class ChainResolver extends AbstractResolver {
         Message.verbose("\t" + getName() + " [chain] " + chain);
         Message.debug("\t\treturn first: " + isReturnFirst());
         Message.debug("\t\tdual: " + isDual());
-        for (DependencyResolver resolver : chain) {
+        chain.forEach((resolver) -> {
             Message.debug("\t\t-> " + resolver.getName());
-        }
+        });
     }
 
     @Override
     public boolean exists(Artifact artifact) {
-        for (DependencyResolver resolver : chain) {
-            if (resolver.exists(artifact)) {
-                return true;
-            }
+        if (chain.stream().anyMatch((resolver) -> (resolver.exists(artifact)))) {
+            return true;
         }
         return false;
     }

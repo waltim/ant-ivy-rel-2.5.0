@@ -61,44 +61,38 @@ public class ManifestHeaderElement {
         if (other.values.size() != values.size()) {
             return false;
         }
-        for (String value : values) {
-            if (!other.values.contains(value)) {
-                return false;
-            }
+        if (!values.stream().noneMatch((value) -> (!other.values.contains(value)))) {
+            return false;
         }
         if (other.directives.size() != directives.size()) {
             return false;
         }
-        for (Map.Entry<String, String> directive : directives.entrySet()) {
-            if (!directive.getValue().equals(other.directives.get(directive.getKey()))) {
-                return false;
-            }
+        if (!directives.entrySet().stream().noneMatch((directive) -> (!directive.getValue().equals(other.directives.get(directive.getKey()))))) {
+            return false;
         }
         if (other.attributes.size() != attributes.size()) {
             return false;
         }
-        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
-            if (!attribute.getValue().equals(other.attributes.get(attribute.getKey()))) {
-                return false;
-            }
+        if (!attributes.entrySet().stream().noneMatch((attribute) -> (!attribute.getValue().equals(other.attributes.get(attribute.getKey()))))) {
+            return false;
         }
         return true;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (String value : values) {
+        values.forEach((value) -> {
             if (sb.length() > 0) {
                 sb.append(";");
             }
             sb.append(value);
-        }
-        for (Map.Entry<String, String> directive : directives.entrySet()) {
+        });
+        directives.entrySet().forEach((directive) -> {
             sb.append(";").append(directive.getKey()).append(":=").append(directive.getValue());
-        }
-        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+        });
+        attributes.entrySet().forEach((attribute) -> {
             sb.append(";").append(attribute.getKey()).append("=").append(attribute.getValue());
-        }
+        });
         return sb.toString();
     }
 }

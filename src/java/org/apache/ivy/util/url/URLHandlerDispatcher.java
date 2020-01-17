@@ -174,9 +174,9 @@ public class URLHandlerDispatcher implements TimeoutConstrainedURLHandler {
     @SuppressWarnings("deprecation")
     public void setRequestMethod(int requestMethod) {
         defaultHandler.setRequestMethod(requestMethod);
-        for (URLHandler handler : handlers.values()) {
+        handlers.values().forEach((handler) -> {
             handler.setRequestMethod(requestMethod);
-        }
+        });
     }
 
     @SuppressWarnings("deprecation")

@@ -536,9 +536,9 @@ public class IvyNode implements Comparable<IvyNode> {
     public String[] getRequiredConfigurations(IvyNode in, String inConf) {
         Collection<String> req = new LinkedHashSet<>();
         addAllIfNotNull(req, usage.getRequiredConfigurations(in, inConf));
-        for (IvyNodeUsage usage : mergedUsages.values()) {
+        mergedUsages.values().forEach((usage) -> {
             addAllIfNotNull(req, usage.getRequiredConfigurations(in, inConf));
-        }
+        });
         return req.toArray(new String[req.size()]);
     }
 
@@ -584,9 +584,9 @@ public class IvyNode implements Comparable<IvyNode> {
     public String[] getConfigurations(String rootModuleConf) {
         Set<String> depConfs = new LinkedHashSet<>();
         addAllIfNotNull(depConfs, usage.getConfigurations(rootModuleConf));
-        for (IvyNodeUsage usage : mergedUsages.values()) {
+        mergedUsages.values().forEach((usage) -> {
             addAllIfNotNull(depConfs, usage.getConfigurations(rootModuleConf));
-        }
+        });
         return depConfs.toArray(new String[depConfs.size()]);
     }
 
@@ -649,9 +649,9 @@ public class IvyNode implements Comparable<IvyNode> {
     public Set<String> getRootModuleConfigurationsSet() {
         Set<String> confs = new LinkedHashSet<>();
         addAllIfNotNull(confs, usage.getRootModuleConfigurations());
-        for (IvyNodeUsage usage : mergedUsages.values()) {
+        mergedUsages.values().forEach((usage) -> {
             addAllIfNotNull(confs, usage.getRootModuleConfigurations());
-        }
+        });
         return confs;
     }
 
@@ -762,9 +762,9 @@ public class IvyNode implements Comparable<IvyNode> {
      */
     public Artifact[] getAllArtifacts() {
         Set<Artifact> ret = new HashSet<>();
-        for (String rootModuleConf : getRootModuleConfigurationsSet()) {
+        getRootModuleConfigurationsSet().forEach((rootModuleConf) -> {
             ret.addAll(Arrays.asList(getArtifacts(rootModuleConf)));
-        }
+        });
         return ret.toArray(new Artifact[ret.size()]);
     }
 
@@ -819,9 +819,9 @@ public class IvyNode implements Comparable<IvyNode> {
         } else {
             Set<IncludeRule> includes = new LinkedHashSet<>();
             addAllIfNotNull(includes, usage.getDependencyIncludesSet(rootModuleConf));
-            for (IvyNodeUsage usage : mergedUsages.values()) {
+            mergedUsages.values().forEach((usage) -> {
                 addAllIfNotNull(includes, usage.getDependencyIncludesSet(rootModuleConf));
-            }
+            });
 
             if ((dependencyArtifacts == null || dependencyArtifacts.isEmpty())
                     && includes.isEmpty()) {
@@ -880,42 +880,39 @@ public class IvyNode implements Comparable<IvyNode> {
 
     private void addArtifactsFromOwnUsage(Set<Artifact> artifacts,
             Set<DependencyArtifactDescriptor> dependencyArtifacts) {
-        for (DependencyArtifactDescriptor dad : dependencyArtifacts) {
+        dependencyArtifacts.forEach((dad) -> {
             artifacts.add(new MDArtifact(md, dad.getName(), dad.getType(), dad.getExt(), dad
                     .getUrl(), dad.getQualifiedExtraAttributes()));
-        }
+        });
     }
 
     private void addArtifactsFromMergedUsage(String rootModuleConf, Set<Artifact> artifacts) {
-        for (IvyNodeUsage usage : mergedUsages.values()) {
+        mergedUsages.values().forEach((usage) -> {
             Set<DependencyArtifactDescriptor> mergedDependencyArtifacts = usage
                     .getDependencyArtifactsSet(rootModuleConf);
             if (mergedDependencyArtifacts != null) {
-                for (DependencyArtifactDescriptor dad : mergedDependencyArtifacts) {
+                mergedDependencyArtifacts.forEach((dad) -> {
                     Map<String, String> extraAttributes = new HashMap<>(
                             dad.getQualifiedExtraAttributes());
                     MDArtifact artifact = new MDArtifact(md, dad.getName(), dad.getType(),
                             dad.getExt(), dad.getUrl(), extraAttributes);
-
                     if (!artifacts.contains(artifact)) {
                         // this is later used to know that this is a merged artifact
                         extraAttributes.put("ivy:merged", dad.getDependencyDescriptor()
                                 .getParentRevisionId() + " -> " + usage.getNode().getId());
                         artifacts.add(artifact);
                     }
-                }
+                });
             }
-        }
+        });
     }
 
     private static Collection<Artifact> findArtifactsMatching(IncludeRule rule,
             Map<ArtifactId, Artifact> allArtifacts) {
         Collection<Artifact> ret = new ArrayList<>();
-        for (Map.Entry<ArtifactId, Artifact> entry : allArtifacts.entrySet()) {
-            if (MatcherHelper.matches(rule.getMatcher(), rule.getId(), entry.getKey())) {
-                ret.add(entry.getValue());
-            }
-        }
+        allArtifacts.entrySet().stream().filter((entry) -> (MatcherHelper.matches(rule.getMatcher(), rule.getId(), entry.getKey()))).forEachOrdered((entry) -> {
+            ret.add(entry.getValue());
+        });
         return ret;
     }
 
@@ -1084,13 +1081,13 @@ public class IvyNode implements Comparable<IvyNode> {
     public boolean doesCallersExclude(String rootModuleConf, Artifact artifact,
             Stack<ModuleRevisionId> callersStack) {
         Deque<IvyNode> callersDeque = new ArrayDeque<>();
-        for (ModuleRevisionId mrid : callersStack) {
+        callersStack.forEach((mrid) -> {
             for (Caller caller : getCallers(rootModuleConf)) {
                 if (caller.getModuleRevisionId().equals(mrid)) {
                     callersDeque.add(data.getNode(mrid));
                 }
             }
-        }
+        });
         return callers.doesCallersExclude(rootModuleConf, artifact, callersDeque);
     }
 
@@ -1130,9 +1127,9 @@ public class IvyNode implements Comparable<IvyNode> {
 
         // bug 105: update selected data with evicted one
         if (evictionData.getSelected() != null) {
-            for (IvyNode selected : evictionData.getSelected()) {
+            evictionData.getSelected().forEach((selected) -> {
                 selected.updateDataFrom(this, rootModuleConf, false);
-            }
+            });
         }
     }
 
@@ -1346,10 +1343,8 @@ public class IvyNode implements Comparable<IvyNode> {
         if (mergedUsages == null) {
             return false;
         }
-        for (IvyNodeUsage usage : mergedUsages.values()) {
-            if (usage.hasTransitiveDepender(rootModuleConf)) {
-                return true;
-            }
+        if (mergedUsages.values().stream().anyMatch((usage) -> (usage.hasTransitiveDepender(rootModuleConf)))) {
+            return true;
         }
         return false;
     }

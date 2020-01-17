@@ -90,10 +90,8 @@ public class ResolveReport {
     }
 
     public boolean hasError() {
-        for (ConfigurationResolveReport report : confReports.values()) {
-            if (report.hasError()) {
-                return true;
-            }
+        if (confReports.values().stream().anyMatch((report) -> (report.hasError()))) {
+            return true;
         }
         return false;
     }
@@ -111,17 +109,17 @@ public class ResolveReport {
 
     public IvyNode[] getEvictedNodes() {
         Collection<IvyNode> all = new LinkedHashSet<>();
-        for (ConfigurationResolveReport report : confReports.values()) {
+        confReports.values().forEach((report) -> {
             all.addAll(Arrays.asList(report.getEvictedNodes()));
-        }
+        });
         return all.toArray(new IvyNode[all.size()]);
     }
 
     public IvyNode[] getUnresolvedDependencies() {
         Collection<IvyNode> all = new LinkedHashSet<>();
-        for (ConfigurationResolveReport report : confReports.values()) {
+        confReports.values().forEach((report) -> {
             all.addAll(Arrays.asList(report.getUnresolvedDependencies()));
-        }
+        });
         return all.toArray(new IvyNode[all.size()]);
     }
 
@@ -161,26 +159,25 @@ public class ResolveReport {
     public ArtifactDownloadReport[] getArtifactsReports(DownloadStatus downloadStatus,
             boolean withEvicted) {
         Collection<ArtifactDownloadReport> all = new LinkedHashSet<>();
-        for (ConfigurationResolveReport report : confReports.values()) {
-            ArtifactDownloadReport[] reports = report.getArtifactsReports(downloadStatus,
-                withEvicted);
-            all.addAll(Arrays.asList(reports));
-        }
+        confReports.values().stream().map((report) -> report.getArtifactsReports(downloadStatus,
+                withEvicted)).forEachOrdered((reports) -> {
+                    all.addAll(Arrays.asList(reports));
+        });
         return all.toArray(new ArtifactDownloadReport[all.size()]);
     }
 
     public ArtifactDownloadReport[] getArtifactsReports(ModuleRevisionId mrid) {
         Collection<ArtifactDownloadReport> all = new LinkedHashSet<>();
-        for (ConfigurationResolveReport report : confReports.values()) {
+        confReports.values().forEach((report) -> {
             all.addAll(Arrays.asList(report.getDownloadReports(mrid)));
-        }
+        });
         return all.toArray(new ArtifactDownloadReport[all.size()]);
     }
 
     public void checkIfChanged() {
-        for (ConfigurationResolveReport report : confReports.values()) {
+        confReports.values().forEach((report) -> {
             report.checkIfChanged();
-        }
+        });
     }
 
     /**
@@ -189,10 +186,8 @@ public class ResolveReport {
      * @return boolean
      */
     public boolean hasChanged() {
-        for (ConfigurationResolveReport report : confReports.values()) {
-            if (report.hasChanged()) {
-                return true;
-            }
+        if (confReports.values().stream().anyMatch((report) -> (report.hasChanged()))) {
+            return true;
         }
         return false;
     }
@@ -207,7 +202,7 @@ public class ResolveReport {
 
     public List<String> getAllProblemMessages() {
         List<String> ret = new ArrayList<>(problemMessages);
-        for (ConfigurationResolveReport r : confReports.values()) {
+        confReports.values().stream().map((r) -> {
             for (IvyNode unresolved : r.getUnresolvedDependencies()) {
                 String errMsg = unresolved.getProblemMessage();
                 if (errMsg.isEmpty()) {
@@ -216,10 +211,12 @@ public class ResolveReport {
                     ret.add("unresolved dependency: " + unresolved.getId() + ": " + errMsg);
                 }
             }
+            return r;
+        }).forEachOrdered((r) -> {
             for (ArtifactDownloadReport adr : r.getFailedArtifactsReports()) {
                 ret.add("download failed: " + adr.getArtifact());
             }
-        }
+        });
         return ret;
     }
 
@@ -227,10 +224,12 @@ public class ResolveReport {
         this.dependencies = dependencies;
         // collect list of artifacts
         artifacts = new ArrayList<>();
-        for (IvyNode dependency : dependencies) {
+        dependencies.stream().map((dependency) -> {
             if (!dependency.isCompletelyEvicted() && !dependency.hasProblem()) {
                 artifacts.addAll(Arrays.asList(dependency.getSelectedArtifacts(artifactFilter)));
             }
+            return dependency;
+        }).forEachOrdered((dependency) -> {
             // update the configurations reports with the dependencies
             // these reports will be completed later with download information, if any
             for (String dconf : dependency.getRootModuleConfigurations()) {
@@ -239,7 +238,7 @@ public class ResolveReport {
                     configurationReport.addDependency(dependency);
                 }
             }
-        }
+        });
     }
 
     /**
@@ -270,12 +269,9 @@ public class ResolveReport {
     public List<ModuleId> getModuleIds() {
         List<ModuleId> ret = new ArrayList<>();
         List<IvyNode> sortedDependencies = new ArrayList<>(dependencies);
-        for (IvyNode dependency : sortedDependencies) {
-            ModuleId mid = dependency.getResolvedId().getModuleId();
-            if (!ret.contains(mid)) {
-                ret.add(mid);
-            }
-        }
+        sortedDependencies.stream().map((dependency) -> dependency.getResolvedId().getModuleId()).filter((mid) -> (!ret.contains(mid))).forEachOrdered((mid) -> {
+            ret.add(mid);
+        });
         return ret;
     }
 
@@ -363,9 +359,9 @@ public class ResolveReport {
                 md.getStatus(), new Date());
 
         // copy namespaces
-        for (Map.Entry<String, String> ns : md.getExtraAttributesNamespaces().entrySet()) {
+        md.getExtraAttributesNamespaces().entrySet().forEach((ns) -> {
             fixedmd.addExtraAttributeNamespace(ns.getKey(), ns.getValue());
-        }
+        });
 
         // copy info
         fixedmd.setDescription(md.getDescription());
@@ -374,19 +370,17 @@ public class ResolveReport {
 
         // copy configurations
         List<String> resolvedConfs = Arrays.asList(getConfigurations());
-        for (String conf : resolvedConfs) {
+        resolvedConfs.forEach((conf) -> {
             fixedmd.addConfiguration(new Configuration(conf));
-        }
-
+        });
         // copy artifacts
-        for (String conf : resolvedConfs) {
+        resolvedConfs.forEach((conf) -> {
             for (Artifact a : md.getArtifacts(conf)) {
                 fixedmd.addArtifact(conf, a);
             }
-        }
-
+        });
         // add resolved dependencies
-        for (IvyNode dep : dependencies) {
+        dependencies.forEach((dep) -> {
             ModuleRevisionId depMrid;
             boolean force;
             if (midToKeep != null && midToKeep.contains(dep.getModuleId())) {
@@ -411,7 +405,7 @@ public class ResolveReport {
             if (!evicted) {
                 fixedmd.addDependency(dd);
             }
-        }
+        });
 
         return fixedmd;
     }

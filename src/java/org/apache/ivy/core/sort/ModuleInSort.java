@@ -150,9 +150,9 @@ class ModuleInSort {
      * that loops are added before.
      */
     private void addToSortList(List<ModuleDescriptor> sortedList) {
-        for (ModuleInSort moduleInLoop : loopElements) {
+        loopElements.forEach((moduleInLoop) -> {
             moduleInLoop.addToSortList(sortedList);
-        }
+        });
         if (!this.isSorted()) {
             sortedList.add(module);
             this.isSorted = true;

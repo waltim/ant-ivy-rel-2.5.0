@@ -61,11 +61,11 @@ class CollectionOfModulesToSort implements Iterable<ModuleInSort> {
         this.nonMatchingVersionReporter = nonMatchingVersionReporter;
         this.modulesByModuleId = new HashMap<>();
         moduleDescriptors = new ArrayList<>(modulesToSort.size());
-        for (ModuleDescriptor md : modulesToSort) {
+        modulesToSort.forEach((md) -> {
             ModuleInSort mdInSort = new ModuleInSort(md);
             moduleDescriptors.add(mdInSort);
             addToModulesByModuleId(md, mdInSort);
-        }
+        });
     }
 
     private void addToModulesByModuleId(ModuleDescriptor md, ModuleInSort mdInSort) {

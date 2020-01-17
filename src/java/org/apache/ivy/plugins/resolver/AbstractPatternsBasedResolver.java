@@ -197,12 +197,12 @@ public abstract class AbstractPatternsBasedResolver extends BasicResolver {
         Set<String> tokenSet = new HashSet<>(Arrays.asList(tokens));
 
         Map<String, String> tokenValues = new HashMap<>();
-        for (Map.Entry<String, Object> entry : criteria.entrySet()) {
+        criteria.entrySet().forEach((entry) -> {
             Object value = entry.getValue();
             if (value instanceof String) {
                 tokenValues.put(entry.getKey(), (String) value);
             }
-        }
+        });
 
         if (tokenSet.isEmpty()) {
             // no more tokens to resolve
@@ -311,13 +311,13 @@ public abstract class AbstractPatternsBasedResolver extends BasicResolver {
         super.dumpSettings();
         Message.debug("\t\tm2compatible: " + isM2compatible());
         Message.debug("\t\tivy patterns:");
-        for (String p : getIvyPatterns()) {
+        getIvyPatterns().forEach((p) -> {
             Message.debug("\t\t\t" + p);
-        }
+        });
         Message.debug("\t\tartifact patterns:");
-        for (String p : getArtifactPatterns()) {
+        getArtifactPatterns().forEach((p) -> {
             Message.debug("\t\t\t" + p);
-        }
+        });
     }
 
     public boolean isM2compatible() {

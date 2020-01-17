@@ -185,10 +185,10 @@ public class BundleInfo {
 
     public void setExecutionEnvironments(List<String> executionEnvironments) {
         this.executionEnvironments = executionEnvironments;
-        for (String executionEnvironment : executionEnvironments) {
+        executionEnvironments.forEach((executionEnvironment) -> {
             addRequirement(new BundleRequirement(EXECUTION_ENVIRONMENT_TYPE, executionEnvironment,
                     null, null));
-        }
+        });
     }
 
     public void addExecutionEnvironment(String name) {
@@ -331,41 +331,33 @@ public class BundleInfo {
 
     public Set<BundleRequirement> getRequires() {
         Set<BundleRequirement> set = new LinkedHashSet<>();
-        for (BundleRequirement requirement : requirements) {
-            if (requirement.getType().equals(BUNDLE_TYPE)) {
-                set.add(requirement);
-            }
-        }
+        requirements.stream().filter((requirement) -> (requirement.getType().equals(BUNDLE_TYPE))).forEachOrdered((requirement) -> {
+            set.add(requirement);
+        });
         return set;
     }
 
     public Set<BundleRequirement> getImports() {
         Set<BundleRequirement> set = new LinkedHashSet<>();
-        for (BundleRequirement requirement : requirements) {
-            if (requirement.getType().equals(PACKAGE_TYPE)) {
-                set.add(requirement);
-            }
-        }
+        requirements.stream().filter((requirement) -> (requirement.getType().equals(PACKAGE_TYPE))).forEachOrdered((requirement) -> {
+            set.add(requirement);
+        });
         return set;
     }
 
     public Set<ExportPackage> getExports() {
         Set<ExportPackage> set = new LinkedHashSet<>();
-        for (BundleCapability capability : capabilities) {
-            if (PACKAGE_TYPE.equals(capability.getType())) {
-                set.add((ExportPackage) capability);
-            }
-        }
+        capabilities.stream().filter((capability) -> (PACKAGE_TYPE.equals(capability.getType()))).forEachOrdered((capability) -> {
+            set.add((ExportPackage) capability);
+        });
         return set;
     }
 
     public Set<BundleCapability> getServices() {
         Set<BundleCapability> set = new LinkedHashSet<>();
-        for (BundleCapability capability : capabilities) {
-            if (SERVICE_TYPE.equals(capability.getType())) {
-                set.add(capability);
-            }
-        }
+        capabilities.stream().filter((capability) -> (SERVICE_TYPE.equals(capability.getType()))).forEachOrdered((capability) -> {
+            set.add(capability);
+        });
         return set;
     }
 

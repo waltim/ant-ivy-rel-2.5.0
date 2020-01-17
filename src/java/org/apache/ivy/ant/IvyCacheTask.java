@@ -69,9 +69,9 @@ public abstract class IvyCacheTask extends IvyPostResolveTask {
                     throw new BuildException("bad confs provided: " + conf
                             + " not found among " + Arrays.asList(report.getConfigurations()));
                 }
-                for (ModuleRevisionId revId : configurationReport.getModuleRevisionIds()) {
+                configurationReport.getModuleRevisionIds().forEach((revId) -> {
                     all.addAll(Arrays.asList(configurationReport.getDownloadReports(revId)));
-                }
+                });
             }
         } else {
             Message.debug("using stored report to get artifacts list");

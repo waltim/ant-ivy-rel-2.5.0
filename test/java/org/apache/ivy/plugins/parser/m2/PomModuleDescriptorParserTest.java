@@ -1103,9 +1103,9 @@ public class PomModuleDescriptorParserTest extends AbstractModuleDescriptorParse
         assertNotNull("Pom file to test, is missing", originalPomFile);
         final List<String> pomContent = Files.readAllLines(Paths.get(originalPomFile.toURI()), StandardCharsets.UTF_8);
         final List<String> replacedContent = new ArrayList<>();
-        for (final String line : pomContent) {
+        pomContent.forEach((line) -> {
             replacedContent.add(line.replaceAll("THIS_WILL_BE_REPLACED_IN_TEST_BY_A_ENV_VAR", envName));
-        }
+        });
         // write the new pom contents into a separate file
         final Path updatedPomFile = Paths.get(workDir.getRoot().toPath().toString(), "updated-test-system-properties.pom");
         Files.write(updatedPomFile, replacedContent, StandardCharsets.UTF_8);

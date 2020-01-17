@@ -129,13 +129,13 @@ public class AntWorkspaceResolver extends DataType {
         private synchronized Map<ModuleDescriptor, File> getModuleDescriptors() {
             if (md2IvyFile == null) {
                 md2IvyFile = new HashMap<>();
-                for (ResourceCollection resources : allResources) {
+                allResources.forEach((resources) -> {
                     for (Resource resource : resources) {
                         File ivyFile = ((FileResource) resource).getFile();
                         try {
                             ModuleDescriptor md = ModuleDescriptorParserRegistry.getInstance()
                                     .parseDescriptor(getParserSettings(), ivyFile.toURI().toURL(),
-                                        isValidate());
+                                            isValidate());
                             md2IvyFile.put(md, ivyFile);
                             Message.debug("Add " + md.getModuleRevisionId().getModuleId());
                         } catch (Exception ex) {
@@ -148,7 +148,7 @@ public class AntWorkspaceResolver extends DataType {
                             }
                         }
                     }
-                }
+                });
             }
             return md2IvyFile;
         }
@@ -169,7 +169,7 @@ public class AntWorkspaceResolver extends DataType {
         protected List<Artifact> createWorkspaceArtifacts(ModuleDescriptor md) {
             List<Artifact> res = new ArrayList<>();
 
-            for (WorkspaceArtifact wa : artifacts) {
+            artifacts.forEach((wa) -> {
                 String name = wa.name;
                 String type = wa.type;
                 String ext = wa.ext;
@@ -199,7 +199,7 @@ public class AntWorkspaceResolver extends DataType {
 
                 res.add(new DefaultArtifact(md.getModuleRevisionId(), new Date(), name, type, ext,
                         url, null));
-            }
+            });
 
             return res;
         }

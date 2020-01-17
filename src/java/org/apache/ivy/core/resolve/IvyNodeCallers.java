@@ -189,9 +189,9 @@ public class IvyNodeCallers {
         caller.addConfiguration(requestedConf, dependencyConfs);
 
         IvyNode parent = callerNode.getRealNode();
-        for (ModuleId mid : parent.getAllCallersModuleIds()) {
+        parent.getAllCallersModuleIds().forEach((mid) -> {
             allCallers.put(mid, parent);
-        }
+        });
         allCallers.put(mrid.getModuleId(), callerNode);
     }
 
@@ -218,31 +218,27 @@ public class IvyNodeCallers {
         }
 
         Set<Caller> mridCallers = new HashSet<>();
-        for (Caller caller : callers.values()) {
-            if (caller.getAskedDependencyId().equals(mrid)) {
-                mridCallers.add(caller);
-            }
-        }
+        callers.values().stream().filter((caller) -> (caller.getAskedDependencyId().equals(mrid))).forEachOrdered((caller) -> {
+            mridCallers.add(caller);
+        });
         return mridCallers;
     }
 
     public Caller[] getAllCallers() {
         Set<Caller> all = new HashSet<>();
-        for (Map<ModuleRevisionId, Caller> callers : callersByRootConf.values()) {
+        callersByRootConf.values().forEach((callers) -> {
             all.addAll(callers.values());
-        }
+        });
         return all.toArray(new Caller[all.size()]);
     }
 
     public Caller[] getAllRealCallers() {
         Set<Caller> all = new HashSet<>();
-        for (Map<ModuleRevisionId, Caller> callers : callersByRootConf.values()) {
-            for (Caller c : callers.values()) {
-                if (c.isRealCaller()) {
-                    all.add(c);
-                }
-            }
-        }
+        callersByRootConf.values().forEach((callers) -> {
+            callers.values().stream().filter((c) -> (c.isRealCaller())).forEachOrdered((c) -> {
+                all.add(c);
+            });
+        });
         return all.toArray(new Caller[all.size()]);
     }
 

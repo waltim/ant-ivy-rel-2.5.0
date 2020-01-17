@@ -64,9 +64,9 @@ public class ModuleRules<T> {
 
     private ModuleRules(Map<MapMatcher, T> rules) {
         this.rules = new LinkedHashMap<>(rules);
-        for (MapMatcher matcher : rules.keySet()) {
+        rules.keySet().forEach((matcher) -> {
             matcherLookup.add(matcher);
-        }
+        });
     }
 
     /**
@@ -202,12 +202,9 @@ public class ModuleRules<T> {
 
     private List<T> getRules(Map<String, String> moduleAttributes, Filter<T> filter) {
         List<T> matchingRules = new ArrayList<>();
-        for (MapMatcher midm : matcherLookup.get(moduleAttributes)) {
-            T rule = rules.get(midm);
-            if (filter.accept(rule)) {
-                matchingRules.add(rule);
-            }
-        }
+        matcherLookup.get(moduleAttributes).stream().map((midm) -> rules.get(midm)).filter((rule) -> (filter.accept(rule))).forEachOrdered((rule) -> {
+            matchingRules.add(rule);
+        });
         return matchingRules;
     }
 
@@ -222,11 +219,11 @@ public class ModuleRules<T> {
             Message.debug(prefix + "NONE");
             return;
         }
-        for (Map.Entry<MapMatcher, T> entry : rules.entrySet()) {
+        rules.entrySet().forEach((entry) -> {
             MapMatcher midm = entry.getKey();
             T rule = entry.getValue();
             Message.debug(prefix + midm + " -> " + rule);
-        }
+        });
     }
 
     /**

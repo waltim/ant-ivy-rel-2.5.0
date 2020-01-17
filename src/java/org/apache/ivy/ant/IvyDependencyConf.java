@@ -55,8 +55,8 @@ public class IvyDependencyConf {
                 dd.addDependencyConfiguration(masterConf, map);
             }
         }
-        for (IvyDependencyConfMapped m : mappeds) {
+        mappeds.forEach((m) -> {
             dd.addDependencyConfiguration(masterConf, m.name);
-        }
+        });
     }
 }

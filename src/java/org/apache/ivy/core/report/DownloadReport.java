@@ -40,11 +40,9 @@ public class DownloadReport {
 
     public ArtifactDownloadReport[] getArtifactsReports(DownloadStatus status) {
         List<ArtifactDownloadReport> ret = new ArrayList<>(artifacts.size());
-        for (ArtifactDownloadReport adr : artifacts.values()) {
-            if (adr.getDownloadStatus() == status) {
-                ret.add(adr);
-            }
-        }
+        artifacts.values().stream().filter((adr) -> (adr.getDownloadStatus() == status)).forEachOrdered((adr) -> {
+            ret.add(adr);
+        });
         return ret.toArray(new ArtifactDownloadReport[ret.size()]);
     }
 

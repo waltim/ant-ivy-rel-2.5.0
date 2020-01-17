@@ -95,31 +95,25 @@ public class MatcherLookup {
         List<MapMatcher> matchers = new ArrayList<>();
         // Step 1: find matchers from nonExactMatchers list
         if (!nonExactMatchers.isEmpty()) {
-            for (MapMatcher matcher : nonExactMatchers) {
-                if (matcher.matches(attrs)) {
-                    matchers.add(matcher);
-                }
-            }
+            nonExactMatchers.stream().filter((matcher) -> (matcher.matches(attrs))).forEachOrdered((matcher) -> {
+                matchers.add(matcher);
+            });
         }
         // Step 2: find matchers from exactMatchers list of key
         String key = key(attrs);
         List<MapMatcher> exactMatchers = lookup.get(key);
         if (exactMatchers != null) {
-            for (MapMatcher matcher : exactMatchers) {
-                if (matcher.matches(attrs)) {
-                    matchers.add(matcher);
-                }
-            }
+            exactMatchers.stream().filter((matcher) -> (matcher.matches(attrs))).forEachOrdered((matcher) -> {
+                matchers.add(matcher);
+            });
         }
         // Step 3: (iff key != DEFAULT) find matchers from exactMatchers of DEFAULT
         if (!DEFAULT.equals(key)) {
             List<MapMatcher> defaultExactMatchers = lookup.get(DEFAULT);
             if (defaultExactMatchers != null) {
-                for (MapMatcher matcher : defaultExactMatchers) {
-                    if (matcher.matches(attrs)) {
-                        matchers.add(matcher);
-                    }
-                }
+                defaultExactMatchers.stream().filter((matcher) -> (matcher.matches(attrs))).forEachOrdered((matcher) -> {
+                    matchers.add(matcher);
+                });
             }
         }
         return matchers;

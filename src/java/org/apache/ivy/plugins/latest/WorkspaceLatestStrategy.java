@@ -38,7 +38,7 @@ public class WorkspaceLatestStrategy extends AbstractLatestStrategy {
         List<ArtifactInfo> head = new ArrayList<>();
         List<ArtifactInfo> tail = new ArrayList<>();
 
-        for (ArtifactInfo ai : delegate.sort(infos)) {
+        delegate.sort(infos).forEach((ai) -> {
             String rev = ai.getRevision();
             boolean latestRev = rev.startsWith("latest") || rev.startsWith("working");
             if (latestRev) {
@@ -46,7 +46,7 @@ public class WorkspaceLatestStrategy extends AbstractLatestStrategy {
             } else {
                 tail.add(ai);
             }
-        }
+        });
 
         head.addAll(tail);
         return head;

@@ -71,11 +71,9 @@ public class ChainVersionMatcher extends AbstractVersionMatcher {
      */
     public void setSettings(IvySettings settings) {
         super.setSettings(settings);
-        for (VersionMatcher matcher : matchers) {
-            if (matcher instanceof IvySettingsAware) {
-                ((IvySettingsAware) matcher).setSettings(settings);
-            }
-        }
+        matchers.stream().filter((matcher) -> (matcher instanceof IvySettingsAware)).forEachOrdered((matcher) -> {
+            ((IvySettingsAware) matcher).setSettings(settings);
+        });
     }
 
     /**
@@ -92,10 +90,8 @@ public class ChainVersionMatcher extends AbstractVersionMatcher {
 
     public boolean isDynamic(ModuleRevisionId askedMrid) {
         Checks.checkNotNull(askedMrid, "askedMrid");
-        for (VersionMatcher matcher : matchers) {
-            if (matcher.isDynamic(askedMrid)) {
-                return true;
-            }
+        if (matchers.stream().anyMatch((matcher) -> (matcher.isDynamic(askedMrid)))) {
+            return true;
         }
         return false;
     }

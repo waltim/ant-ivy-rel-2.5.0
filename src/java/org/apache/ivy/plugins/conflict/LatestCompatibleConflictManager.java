@@ -188,14 +188,16 @@ public class LatestCompatibleConflictManager extends LatestConflictManager {
             settings.getVersionMatcher(), parent, selected, evicted, callerStack);
         if (toBlacklist != null) {
             final StringBuilder blacklisted = new StringBuilder();
-            for (IvyNodeBlacklist blacklist : toBlacklist) {
+            toBlacklist.stream().map((blacklist) -> {
                 if (blacklisted.length() > 0) {
                     blacklisted.append(" ");
                 }
                 IvyNode blacklistedNode = blacklist.getBlacklistedNode();
                 blacklistedNode.blacklist(blacklist);
+                return blacklistedNode;
+            }).forEachOrdered((blacklistedNode) -> {
                 blacklisted.append(blacklistedNode);
-            }
+            });
 
             String rootModuleConf = parent.getData().getReport().getConfiguration();
             evicted.markEvicted(new EvictionData(rootModuleConf, parent, this, Collections
@@ -289,17 +291,15 @@ public class LatestCompatibleConflictManager extends LatestConflictManager {
             Collection<ModuleRevisionId> foundBlacklisted) {
         ResolveData resolveData = IvyContext.getContext().getResolveData();
         Collection<IvyNode> blacklisted = new HashSet<>();
-        for (ModuleRevisionId mrid : foundBlacklisted) {
+        foundBlacklisted.forEach((mrid) -> {
             blacklisted.add(resolveData.getNode(mrid));
-        }
-
-        for (IvyNode node : blacklisted) {
-            IvyNodeBlacklist bdata = node.getBlacklistData(resolveData.getReport()
-                    .getConfiguration());
-            handleUnsolvableConflict(bdata.getConflictParent(),
-                Arrays.asList(bdata.getEvictedNode(), bdata.getSelectedNode()),
-                bdata.getEvictedNode(), bdata.getSelectedNode());
-        }
+        });
+        blacklisted.stream().map((node) -> node.getBlacklistData(resolveData.getReport()
+                .getConfiguration())).forEachOrdered((bdata) -> {
+                    handleUnsolvableConflict(bdata.getConflictParent(),
+                            Arrays.asList(bdata.getEvictedNode(), bdata.getSelectedNode()),
+                            bdata.getEvictedNode(), bdata.getSelectedNode());
+        });
     }
 
     @Override

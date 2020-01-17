@@ -58,7 +58,7 @@ public class MirroredURLResolver extends RepositoryResolver {
                     + mirrorListUrl + " (" + e.getMessage() + ")");
         }
         List<Repository> repositories = new ArrayList<>();
-        for (String baseUrl : mirrorBaseUrls) {
+        mirrorBaseUrls.stream().map((baseUrl) -> {
             URL url = null;
             try {
                 url = new URL(baseUrl);
@@ -66,11 +66,10 @@ public class MirroredURLResolver extends RepositoryResolver {
                 Message.warn("In the mirror list from " + mirrorListUrl
                         + ", an incorrect url has been found and will then not be used: " + baseUrl);
             }
-            if (url != null) {
-                final RelativeURLRepository repo = new RelativeURLRepository(url, this.getTimeoutConstraint());
-                repositories.add(repo);
-            }
-        }
+            return url;
+        }).filter((url) -> (url != null)).map((url) -> new RelativeURLRepository(url, this.getTimeoutConstraint())).forEachOrdered((repo) -> {
+            repositories.add(repo);
+        });
         ((ChainedRepository) getRepository()).setRepositories(repositories);
     }
 

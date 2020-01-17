@@ -285,23 +285,23 @@ public class IvyMakePom extends IvyTask {
 
     private Map<String, String> getMappingsMap() {
         Map<String, String> mappingsMap = new LinkedHashMap<>();
-        for (Mapping mapping : mappings) {
+        mappings.forEach((mapping) -> {
             for (String mappingConf : splitToArray(mapping.getConf())) {
                 if (!mappingsMap.containsKey(mappingConf)) {
                     mappingsMap.put(mappingConf, mapping.getScope());
                 }
             }
-        }
+        });
         return mappingsMap;
     }
 
     private List<ExtraDependency> getDependencies() {
         List<ExtraDependency> result = new ArrayList<>();
-        for (Dependency dependency : dependencies) {
+        dependencies.forEach((dependency) -> {
             result.add(new ExtraDependency(dependency.getGroup(), dependency.getArtifact(),
                     dependency.getVersion(), dependency.getScope(), dependency.getType(),
                     dependency.getClassifier(), dependency.getOptional()));
-        }
+        });
         return result;
     }
 }

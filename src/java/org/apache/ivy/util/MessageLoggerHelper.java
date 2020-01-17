@@ -33,15 +33,15 @@ public final class MessageLoggerHelper {
             }
             if (myWarns.size() > 0) {
                 logger.log(":::: WARNINGS", Message.MSG_WARN);
-                for (String msg : myWarns) {
+                myWarns.forEach((msg) -> {
                     logger.log("\t" + msg + "\n", Message.MSG_WARN);
-                }
+                });
             }
             if (myErrors.size() > 0) {
                 logger.log(":::: ERRORS", Message.MSG_ERR);
-                for (String msg : myErrors) {
+                myErrors.forEach((msg) -> {
                     logger.log("\t" + msg + "\n", Message.MSG_ERR);
-                }
+                });
             }
             logger.info("\n:: USE VERBOSE OR DEBUG MESSAGE LEVEL FOR MORE DETAILS");
         }

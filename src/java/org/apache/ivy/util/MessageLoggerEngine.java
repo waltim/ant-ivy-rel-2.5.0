@@ -138,9 +138,9 @@ public class MessageLoggerEngine implements MessageLogger {
 
     public void clearProblems() {
         getDefaultLogger().clearProblems();
-        for (MessageLogger l : getLoggerStack()) {
+        getLoggerStack().forEach((l) -> {
             l.clearProblems();
-        }
+        });
         problems.clear();
         errors.clear();
         warns.clear();
@@ -149,9 +149,9 @@ public class MessageLoggerEngine implements MessageLogger {
     public void setShowProgress(boolean progress) {
         getDefaultLogger().setShowProgress(progress);
         // updates all loggers in the stack
-        for (MessageLogger l : getLoggerStack()) {
+        getLoggerStack().forEach((l) -> {
             l.setShowProgress(progress);
-        }
+        });
     }
 
     public boolean isShowProgress() {

@@ -233,12 +233,12 @@ public abstract class FileBasedLockStrategy extends AbstractLockStrategy {
         if (m == null) {
             return "(NULL)";
         }
-        for (Thread t : m.keySet()) {
+        m.keySet().forEach((t) -> {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
             sb.append(t.toString());
-        }
+        });
         return sb.toString();
     }
 

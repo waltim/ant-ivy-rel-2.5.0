@@ -59,9 +59,9 @@ public final class Main {
             String name = line.getOptionValue("n", "jar");
             Collection<File> files = FindFile.find(dir, name);
             System.out.println("listing files in " + dir + " containing " + name);
-            for (File file : files) {
+            files.forEach((file) -> {
                 System.out.println("\t" + file + "\n");
-            }
+            });
         } catch (ParseException exp) {
             // oops, something went wrong
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());

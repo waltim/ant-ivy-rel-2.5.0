@@ -90,13 +90,11 @@ public class AntBuildTrigger extends AbstractTrigger implements Trigger {
                 if (target != null) {
                     ant.setTarget(target);
                 }
-                for (Map.Entry<String, String> entry : event.getAttributes().entrySet()) {
-                    if (entry.getValue() != null) {
-                        Property p = ant.createProperty();
-                        p.setName(prefix == null ? entry.getKey() : prefix + entry.getKey());
-                        p.setValue(entry.getValue());
-                    }
-                }
+                event.getAttributes().entrySet().stream().filter((entry) -> (entry.getValue() != null)).forEachOrdered((entry) -> {
+                    Property p = ant.createProperty();
+                    p.setName(prefix == null ? entry.getKey() : prefix + entry.getKey());
+                    p.setValue(entry.getValue());
+                });
 
                 Message.verbose("triggering build: " + f + " target=" + target + " for " + event);
                 try {

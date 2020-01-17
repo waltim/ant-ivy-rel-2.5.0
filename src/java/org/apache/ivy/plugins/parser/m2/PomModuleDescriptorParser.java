@@ -147,28 +147,26 @@ public final class PomModuleDescriptorParser implements ModuleDescriptorParser {
             Message.debug("parent.artifactId: " + domReader.getParentArtifactId());
             Message.debug("parent.version: " + domReader.getParentVersion());
 
-            for (final Map.Entry<String, String> prop : domReader.getPomProperties().entrySet()) {
+            domReader.getPomProperties().entrySet().stream().map((prop) -> {
                 domReader.setProperty(prop.getKey(), prop.getValue());
+                return prop;
+            }).forEachOrdered((prop) -> {
                 mdBuilder.addProperty(prop.getKey(), prop.getValue());
-            }
+            });
             final List<PomProfileElement> activeProfiles = new ArrayList<>();
             // add profile specific properties
-            for (final PomProfileElement profile : domReader.getProfiles()) {
-                if (!profile.isActive()) {
-                    continue;
-                }
+            domReader.getProfiles().stream().filter((profile) -> !(!profile.isActive())).map((profile) -> {
                 // keep track of this active profile for later use
                 activeProfiles.add(profile);
-
-                final Map<String, String> profileProps = profile.getProfileProperties();
-                if (profileProps.isEmpty()) {
-                    continue;
-                }
-                for (final Map.Entry<String, String> entry : profileProps.entrySet()) {
+                return profile;
+            }).map((profile) -> profile.getProfileProperties()).filter((profileProps) -> !(profileProps.isEmpty())).forEachOrdered((profileProps) -> {
+                profileProps.entrySet().stream().map((entry) -> {
                     domReader.setProperty(entry.getKey(), entry.getValue());
+                    return entry;
+                }).forEachOrdered((entry) -> {
                     mdBuilder.addProperty(entry.getKey(), entry.getValue());
-                }
-            }
+                });
+            });
 
             ModuleDescriptor parentDescr = null;
             if (domReader.hasParent()) {
@@ -284,25 +282,24 @@ public final class PomModuleDescriptorParser implements ModuleDescriptorParser {
                 for (PomDependencyMgt dep : domReader.getDependencyMgt()) {
                     addTo(mdBuilder, dep, ivySettings);
                 }
-                for (PomDependencyData dep : domReader.getDependencies()) {
+                domReader.getDependencies().forEach((dep) -> {
                     mdBuilder.addDependency(res, dep);
-                }
-
-                for (PomPluginElement plugin : domReader.getPlugins()) {
+                });
+                domReader.getPlugins().forEach((plugin) -> {
                     mdBuilder.addPlugin(plugin);
-                }
+                });
 
                 // consult active profiles:
                 for (final PomProfileElement activeProfile : activeProfiles) {
                     for (PomDependencyMgt dep : activeProfile.getDependencyMgt()) {
                         addTo(mdBuilder, dep, ivySettings);
                     }
-                    for (PomDependencyData dep : activeProfile.getDependencies()) {
+                    activeProfile.getDependencies().forEach((dep) -> {
                         mdBuilder.addDependency(res, dep);
-                    }
-                    for (PomPluginElement plugin : activeProfile.getPlugins()) {
+                    });
+                    activeProfile.getPlugins().forEach((plugin) -> {
                         mdBuilder.addPlugin(plugin);
-                    }
+                    });
                 }
 
                 if (parentDescr != null) {
@@ -349,11 +346,11 @@ public final class PomModuleDescriptorParser implements ModuleDescriptorParser {
             ModuleDescriptor importDescr = importModule.getDescriptor();
 
             // add dependency management info from imported module
-            for (PomDependencyMgt importedDepMgt : getDependencyManagements(importDescr)) {
+            getDependencyManagements(importDescr).forEach((importedDepMgt) -> {
                 mdBuilder.addDependencyMgt(new DefaultPomDependencyMgt(importedDepMgt.getGroupId(),
                         importedDepMgt.getArtifactId(), importedDepMgt.getVersion(),
                         importedDepMgt.getScope(), importedDepMgt.getExcludedModules()));
-            }
+            });
         } else {
             mdBuilder.addDependencyMgt(dep);
         }

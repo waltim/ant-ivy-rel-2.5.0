@@ -197,7 +197,7 @@ public abstract class AbstractWorkspaceResolver extends AbstractResolver {
         newMd.setStatus(md.getStatus());
 
         Configuration[] allConfs = md.getConfigurations();
-        for (Artifact af : createWorkspaceArtifacts(md)) {
+        createWorkspaceArtifacts(md).forEach((af) -> {
             if (allConfs.length == 0) {
                 newMd.addArtifact(ModuleDescriptor.DEFAULT_CONFIGURATION, af);
             } else {
@@ -206,7 +206,7 @@ public abstract class AbstractWorkspaceResolver extends AbstractResolver {
                     newMd.addArtifact(conf.getName(), af);
                 }
             }
-        }
+        });
 
         for (DependencyDescriptor dependency : md.getDependencies()) {
             newMd.addDependency(dependency);

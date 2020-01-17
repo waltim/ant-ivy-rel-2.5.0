@@ -44,13 +44,11 @@ public class PluginAdapter {
         b.setDescription(feature.getDescription());
         b.setLicense(feature.getLicense());
 
-        for (EclipsePlugin plugin : feature.getPlugins()) {
-            BundleRequirement r = new BundleRequirement(BundleInfo.BUNDLE_TYPE, plugin.getId(),
-                    new VersionRange(plugin.getVersion()), null);
-            b.addRequirement(r);
-        }
-
-        for (Require require : feature.getRequires()) {
+        feature.getPlugins().stream().map((plugin) -> new BundleRequirement(BundleInfo.BUNDLE_TYPE, plugin.getId(),
+                new VersionRange(plugin.getVersion()), null)).forEachOrdered((r) -> {
+                    b.addRequirement(r);
+        });
+        feature.getRequires().stream().map((require) -> {
             String id;
             if (require.getPlugin() != null) {
                 id = require.getPlugin();
@@ -64,8 +62,10 @@ public class PluginAdapter {
                 throw new IllegalStateException("unsupported match " + require.getMatch());
             }
             BundleRequirement r = new BundleRequirement(BundleInfo.BUNDLE_TYPE, id, range, null);
+            return r;
+        }).forEachOrdered((r) -> {
             b.addRequirement(r);
-        }
+        });
 
         return b;
     }

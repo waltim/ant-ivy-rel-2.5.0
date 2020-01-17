@@ -130,22 +130,22 @@ public final class IvyPatternHelper {
             ArtifactOrigin origin, Map<String, String> extraModuleAttributes, Map<String, String> extraArtifactAttributes) {
         Map<String, Object> tokens = new HashMap<>();
         if (extraModuleAttributes != null) {
-            for (Map.Entry<String, String> entry : extraModuleAttributes.entrySet()) {
+            extraModuleAttributes.entrySet().forEach((entry) -> {
                 String token = entry.getKey();
                 if (token.indexOf(':') > 0) {
                     token = token.substring(token.indexOf(':') + 1);
                 }
                 tokens.put(token, entry.getValue());
-            }
+            });
         }
         if (extraArtifactAttributes != null) {
-            for (Map.Entry<String, String> entry : extraArtifactAttributes.entrySet()) {
+            extraArtifactAttributes.entrySet().forEach((entry) -> {
                 String token = entry.getKey();
                 if (token.indexOf(':') > 0) {
                     token = token.substring(token.indexOf(':') + 1);
                 }
                 tokens.put(token, entry.getValue());
-            }
+            });
         }
         tokens.put(ORGANISATION_KEY, org == null ? "" : org);
         tokens.put(ORGANISATION_KEY2, org == null ? "" : org);

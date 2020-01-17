@@ -271,20 +271,18 @@ public class IvyResolve extends IvyTask {
                     Ivy.getWorkingRevision());
                 DefaultModuleDescriptor md = DefaultModuleDescriptor.newBasicInstance(mrid, null);
 
-                for (IvyDependency dep : dependencies) {
-                    DependencyDescriptor dd = dep.asDependencyDescriptor(md, "default", settings);
+                dependencies.stream().map((dep) -> dep.asDependencyDescriptor(md, "default", settings)).forEachOrdered((dd) -> {
                     md.addDependency(dd);
-                }
-
-                for (IvyExclude exclude : excludes) {
-                    DefaultExcludeRule rule = exclude.asRule(settings);
+                });
+                excludes.stream().map((exclude) -> exclude.asRule(settings)).map((rule) -> {
                     rule.addConfiguration("default");
+                    return rule;
+                }).forEachOrdered((rule) -> {
                     md.addExcludeRule(rule);
-                }
-
-                for (IvyConflict conflict : conflicts) {
+                });
+                conflicts.forEach((conflict) -> {
                     conflict.addConflict(md, settings);
-                }
+                });
 
                 report = ivy
                         .resolve(md, getResolveOptions(ivy, new String[] {"default"}, settings));
@@ -353,7 +351,7 @@ public class IvyResolve extends IvyTask {
                 getProject().setProperty("ivy.revision", mdRev);
                 settings.setVariable("ivy.revision", mdRev);
                 List<ExtendsDescriptor> parents = Arrays.asList(md.getInheritedDescriptors());
-                for (ExtendsDescriptor parent : parents) {
+                parents.forEach((parent) -> {
                     int i = parents.indexOf(parent);
                     String parentOrg = parent.getResolvedParentRevisionId().getOrganisation();
                     String parentModule = parent.getResolvedParentRevisionId().getName();
@@ -369,7 +367,7 @@ public class IvyResolve extends IvyTask {
                         getProject().setProperty("ivy.parent[" + i + "].branch", parentBranch);
                         settings.setVariable("ivy.parent[" + i + "].branch", parentBranch);
                     }
-                }
+                });
                 getProject().setProperty("ivy.parents.count",
                     String.valueOf(md.getInheritedDescriptors().length));
                 settings.setVariable("ivy.parents.count",

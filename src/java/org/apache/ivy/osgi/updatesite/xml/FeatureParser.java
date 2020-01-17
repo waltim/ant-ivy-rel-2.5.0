@@ -105,9 +105,9 @@ public class FeatureParser {
             addChild(new RequiresHandler(), new ChildElementHandler<RequiresHandler>() {
                 @Override
                 public void childHandled(RequiresHandler child) {
-                    for (Require require : child.requires) {
+                    child.requires.forEach((require) -> {
                         feature.addRequire(require);
-                    }
+                    });
                 }
             });
             // addChild(new UrlHandler(), new ChildElementHandler<UrlHandler>() {

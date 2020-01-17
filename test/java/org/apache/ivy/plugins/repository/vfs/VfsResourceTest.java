@@ -143,26 +143,21 @@ public class VfsResourceTest {
         final List<String> expectedFiles =
                 Arrays.asList("ivy-1.0.xml", "ivy-1.1.xml", "ivy-1.2.xml", "ivy-1.3.xml");
 
-        for (VfsURI baseVfsURI : helper.createVFSUriSet(testFolder)) {
+        helper.createVFSUriSet(testFolder).forEach((baseVfsURI) -> {
             List<String> expected = new ArrayList<>();
-            for (String expectedFile : expectedFiles) {
-                String resId = baseVfsURI.toString() + "/" + expectedFile;
+            expectedFiles.stream().map((expectedFile) -> baseVfsURI.toString() + "/" + expectedFile).forEachOrdered((resId) -> {
                 expected.add(resId);
-            }
-
+            });
             List<String> actual = new ArrayList<>();
             VfsResource res = new VfsResource(baseVfsURI.toString(), helper.fsManager);
-            for (String resId : res.getChildren()) {
-                // remove entries ending in .svn
-                if (!resId.endsWith(".svn")) {
-                    actual.add(resId);
-                }
-            }
-
+            // remove entries ending in .svn
+            res.getChildren().stream().filter((resId) -> (!resId.endsWith(".svn"))).forEachOrdered((resId) -> {
+                actual.add(resId);
+            });
             Collections.sort(actual);
             Collections.sort(expected);
             assertEquals("\nExpected: " + expected.toString() + "\nActual: " + actual.toString(), actual, expected);
-        }
+        });
     }
 
     /**
@@ -171,12 +166,10 @@ public class VfsResourceTest {
      */
     @Test
     public void testListFileChildren() {
-        for (VfsURI vfsURI : helper.createVFSUriSet(VfsTestHelper.TEST_IVY_XML)) {
-            VfsResource res = new VfsResource(vfsURI.toString(), helper.fsManager);
-            List<String> results = res.getChildren();
+        helper.createVFSUriSet(VfsTestHelper.TEST_IVY_XML).stream().map((vfsURI) -> new VfsResource(vfsURI.toString(), helper.fsManager)).map((res) -> res.getChildren()).forEachOrdered((results) -> {
             assertEquals("getChildren query on file provided results when it shouldn't have", 0,
-                results.size());
-        }
+                    results.size());
+        });
     }
 
     /**
@@ -185,11 +178,9 @@ public class VfsResourceTest {
      */
     @Test
     public void testListImaginary() {
-        for (VfsURI vfsURI : helper.createVFSUriSet("idontexistzzxx")) {
-            VfsResource res = new VfsResource(vfsURI.toString(), helper.fsManager);
-            List<String> results = res.getChildren();
+        helper.createVFSUriSet("idontexistzzxx").stream().map((vfsURI) -> new VfsResource(vfsURI.toString(), helper.fsManager)).map((res) -> res.getChildren()).forEachOrdered((results) -> {
             assertEquals("getChildren query on file provided results when it shouldn't have", 0,
-                results.size());
-        }
+                    results.size());
+        });
     }
 }

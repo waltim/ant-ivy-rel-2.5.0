@@ -100,13 +100,13 @@ public class IvyCachePath extends IvyCacheTask {
             path.createPathElement().setLocation(f);
             return;
         }
-        for (String p : cp) {
+        cp.forEach((p) -> {
             if (p.equals(".")) {
                 path.createPathElement().setLocation(f);
             } else {
                 path.createPathElement().setLocation(new File(f, p));
             }
-        }
+        });
     }
 
 }

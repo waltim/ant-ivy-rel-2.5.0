@@ -35,9 +35,7 @@ public final class FileSize {
 
   public static long totalSize(Collection<File> files) {
     long total = 0;
-    for (File file : files) {
-      total += file.length();
-    }
+    total = files.stream().map((file) -> file.length()).reduce(total, (accumulator, _item) -> accumulator + _item);
     return total;
   }
 

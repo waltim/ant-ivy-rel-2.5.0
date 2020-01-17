@@ -207,9 +207,9 @@ public class IvyNodeEviction {
         Collection<IvyNode> resolved = selectedDeps.get(new ModuleIdConf(mid, rootModuleConf));
         Set<IvyNode> ret = new HashSet<>();
         if (resolved != null) {
-            for (IvyNode node : resolved) {
+            resolved.forEach((node) -> {
                 ret.add(node.getRealNode());
-            }
+            });
         }
         return ret;
     }
@@ -220,18 +220,17 @@ public class IvyNodeEviction {
             return new HashSet<>();
         } else {
             Collection<ModuleRevisionId> resolvedRevs = new HashSet<>();
-            for (IvyNode node : resolved) {
+            resolved.stream().map((node) -> {
                 ModuleRevisionId resolvedId = node.getResolvedId();
                 resolvedRevs.add(node.getId());
                 resolvedRevs.add(resolvedId);
-
                 // in case there are extra attributes on the resolved module we also add the
                 // the module without these extra attributes (cfr. IVY-1236)
-                if (!resolvedId.getExtraAttributes().isEmpty()) {
-                    resolvedRevs.add(ModuleRevisionId.newInstance(resolvedId.getOrganisation(),
+                return resolvedId;
+            }).filter((resolvedId) -> (!resolvedId.getExtraAttributes().isEmpty())).forEachOrdered((resolvedId) -> {
+                resolvedRevs.add(ModuleRevisionId.newInstance(resolvedId.getOrganisation(),
                         resolvedId.getName(), resolvedId.getBranch(), resolvedId.getRevision()));
-                }
-            }
+            });
             return resolvedRevs;
         }
     }
@@ -246,9 +245,9 @@ public class IvyNodeEviction {
         Collection<IvyNode> resolved = evictedDeps.get(new ModuleIdConf(mid, rootModuleConf));
         Set<IvyNode> ret = new HashSet<>();
         if (resolved != null) {
-            for (IvyNode node : resolved) {
+            resolved.forEach((node) -> {
                 ret.add(node.getRealNode());
-            }
+            });
         }
         return ret;
     }
@@ -268,10 +267,12 @@ public class IvyNodeEviction {
         ModuleIdConf moduleIdConf = new ModuleIdConf(moduleId, rootModuleConf);
         evictedDeps.put(moduleIdConf, new HashSet<>(evicted));
         Collection<ModuleRevisionId> evictedRevs = new HashSet<>();
-        for (IvyNode node : evicted) {
+        evicted.stream().map((node) -> {
             evictedRevs.add(node.getId());
+            return node;
+        }).forEachOrdered((node) -> {
             evictedRevs.add(node.getResolvedId());
-        }
+        });
         this.evictedRevs.put(moduleIdConf, evictedRevs);
     }
 
@@ -311,13 +312,11 @@ public class IvyNodeEviction {
         while (iter.hasNext()) {
             Collection<IvyNode> sel = evicted.get(iter.next()).getSelected();
             if (sel != null) {
-                for (IvyNode n : sel) {
-                    if (n.getRealNode().equals(node)) {
-                        // yes, we are the real node for a selected one !
-                        // we are no more evicted in this conf !
-                        iter.remove();
-                    }
-                }
+                sel.stream().filter((n) -> (n.getRealNode().equals(node))).forEachOrdered((_item) -> {
+                    // yes, we are the real node for a selected one !
+                    // we are no more evicted in this conf !
+                    iter.remove();
+                });
             }
         }
     }
@@ -377,9 +376,9 @@ public class IvyNodeEviction {
 
     public Collection<ConflictManager> getAllEvictingConflictManagers() {
         Collection<ConflictManager> ret = new HashSet<>();
-        for (EvictionData ed : evicted.values()) {
+        evicted.values().forEach((ed) -> {
             ret.add(ed.getConflictManager());
-        }
+        });
         return ret;
     }
 
@@ -411,9 +410,9 @@ public class IvyNodeEviction {
         Collection<IvyNode> resolved = pendingConflicts.get(new ModuleIdConf(mid, rootModuleConf));
         Set<IvyNode> ret = new HashSet<>();
         if (resolved != null) {
-            for (IvyNode node : resolved) {
+            resolved.forEach((node) -> {
                 ret.add(node.getRealNode());
-            }
+            });
         }
         return ret;
     }

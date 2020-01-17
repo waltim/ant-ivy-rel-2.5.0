@@ -257,23 +257,27 @@ public abstract class AbstractOSGiResolver extends BasicResolver {
                     if (requirementStrategy == RequirementStrategy.first) {
                         Message.warn("Ambiguity for the '" + osgiType + "' requirement "
                                 + mrid.getName() + ";version=" + mrid.getRevision());
-                        for (Map.Entry<String, List<MDResolvedResource>> entry : matching.entrySet()) {
+                        matching.entrySet().stream().map((entry) -> {
                             Message.warn("\t" + entry.getKey());
-                            for (MDResolvedResource c : entry.getValue()) {
+                            return entry;
+                        }).forEachOrdered((entry) -> {
+                            entry.getValue().forEach((c) -> {
                                 Message.warn("\t\t" + c.getRevision()
                                         + (found == c ? " (selected)" : ""));
-                            }
-                        }
+                            });
+                        });
                     } else if (requirementStrategy == RequirementStrategy.noambiguity) {
                         Message.error("Ambiguity for the '" + osgiType + "' requirement "
                                 + mrid.getName() + ";version=" + mrid.getRevision());
-                        for (Map.Entry<String, List<MDResolvedResource>> entry : matching.entrySet()) {
+                        matching.entrySet().stream().map((entry) -> {
                             Message.error("\t" + entry.getKey());
-                            for (MDResolvedResource c : entry.getValue()) {
+                            return entry;
+                        }).forEachOrdered((entry) -> {
+                            entry.getValue().forEach((c) -> {
                                 Message.error("\t\t" + c.getRevision()
                                         + (found == c ? " (best match)" : ""));
-                            }
-                        }
+                            });
+                        });
                         return null;
                     }
                 }
@@ -337,9 +341,9 @@ public abstract class AbstractOSGiResolver extends BasicResolver {
             List<String> versions = new ArrayList<>();
             Set<ModuleDescriptorWrapper> mds = getRepoDescriptor().findModules(osgiType, name);
             if (mds != null) {
-                for (ModuleDescriptorWrapper md : mds) {
+                mds.forEach((md) -> {
                     versions.add(md.getBundleInfo().getVersion().toString());
-                }
+                });
             }
             return versions;
         }
@@ -458,11 +462,13 @@ public abstract class AbstractOSGiResolver extends BasicResolver {
         String module = stringCriteria.get(IvyPatternHelper.MODULE_KEY);
         if (module == null) {
             Set<Map<String, String>> tokenValues = new HashSet<>();
-            for (String name : capabilities) {
+            capabilities.stream().map((name) -> {
                 Map<String, Object> newCriteria = new HashMap<>(criteria);
                 newCriteria.put(IvyPatternHelper.MODULE_KEY, name);
+                return newCriteria;
+            }).forEachOrdered((newCriteria) -> {
                 tokenValues.addAll(listTokenValues(remainingTokens, newCriteria));
-            }
+            });
             return tokenValues;
         }
         values.put(IvyPatternHelper.MODULE_KEY, module);
@@ -475,12 +481,14 @@ public abstract class AbstractOSGiResolver extends BasicResolver {
                 return Collections.emptySet();
             }
             Set<Map<String, String>> tokenValues = new HashSet<>();
-            for (ModuleDescriptorWrapper mdw : mdws) {
+            mdws.stream().map((mdw) -> {
                 Map<String, Object> newCriteria = new HashMap<>(criteria);
                 newCriteria.put(IvyPatternHelper.REVISION_KEY, mdw.getBundleInfo().getVersion()
                         .toString());
+                return newCriteria;
+            }).forEachOrdered((newCriteria) -> {
                 tokenValues.addAll(listTokenValues(remainingTokens, newCriteria));
-            }
+            });
             return tokenValues;
         }
         values.put(IvyPatternHelper.REVISION_KEY, rev);
@@ -510,11 +518,13 @@ public abstract class AbstractOSGiResolver extends BasicResolver {
             Set<Map<String, String>> tokenValues = new HashSet<>();
             List<String> configurations = BundleInfoAdapter
                     .getConfigurations(found.getBundleInfo());
-            for (String configuration : configurations) {
+            configurations.stream().map((configuration) -> {
                 Map<String, String> newCriteria = new HashMap<>(stringCriteria);
                 newCriteria.put(IvyPatternHelper.CONF_KEY, configuration);
+                return newCriteria;
+            }).forEachOrdered((newCriteria) -> {
                 tokenValues.add(newCriteria);
-            }
+            });
             return tokenValues;
         }
         values.put(IvyPatternHelper.CONF_KEY, conf);

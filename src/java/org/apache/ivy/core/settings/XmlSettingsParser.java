@@ -141,9 +141,9 @@ public class XmlSettingsParser extends DefaultHandler {
             }
         });
         // put every type definition from ivy to configurator
-        for (Map.Entry<String, Class<?>> entry : ivy.getTypeDefs().entrySet()) {
+        ivy.getTypeDefs().entrySet().forEach((entry) -> {
             configurator.typeDef(entry.getKey(), entry.getValue());
-        }
+        });
 
         doParse(settings);
     }
@@ -587,9 +587,9 @@ public class XmlSettingsParser extends DefaultHandler {
             configurator.addChild(qName, child);
         } else {
             configurator.startCreateChild(qName);
-            for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+            attributes.entrySet().forEach((attribute) -> {
                 configurator.setAttribute(attribute.getKey(), attribute.getValue());
-            }
+            });
         }
     }
 

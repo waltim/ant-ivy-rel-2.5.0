@@ -43,10 +43,10 @@ public class ApacheURLListerTest {
             ApacheURLListerTest.class.getResource("apache-file-listing.html"), true, false);
         assertNotNull(files);
         assertTrue(files.size() > 0);
-        for (URL file : files) {
+        files.forEach((file) -> {
             assertTrue("found a non matching file: " + file,
-                file.getPath().matches(".*/[^/]+\\.(jar|md5|sha1)"));
-        }
+                    file.getPath().matches(".*/[^/]+\\.(jar|md5|sha1)"));
+        });
 
         // try a directory listing
         List<URL> dirs = lister.retrieveListing(

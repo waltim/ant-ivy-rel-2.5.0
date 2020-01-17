@@ -76,11 +76,11 @@ public class AntCallTrigger extends AbstractTrigger implements Trigger {
             String target = IvyPatternHelper.substituteTokens(getTarget(), attributes);
             call.setTarget(target);
 
-            for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            attributes.entrySet().forEach((entry) -> {
                 Property p = call.createParam();
                 p.setName(prefix == null ? entry.getKey() : prefix + entry.getKey());
                 p.setValue(entry.getValue() == null ? "" : entry.getValue());
-            }
+            });
 
             Message.verbose("triggering ant call: target=" + target + " for " + event);
             call.execute();

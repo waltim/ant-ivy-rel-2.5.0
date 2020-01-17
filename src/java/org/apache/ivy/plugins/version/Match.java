@@ -85,9 +85,9 @@ public class Match {
         }
 
         Map<String, String> variables = new HashMap<>();
-        for (String arg : args) {
+        args.forEach((arg) -> {
             variables.put(arg, argValues.get(args.indexOf(arg)));
-        }
+        });
 
         String pattern = getPattern();
         pattern = IvyPatternHelper.substituteVariables(pattern, variables);

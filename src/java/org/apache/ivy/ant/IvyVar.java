@@ -110,9 +110,9 @@ public class IvyVar extends IvyTask {
                     }
                 }
             }
-            for (Map.Entry<Object, Object> entry : props.entrySet()) {
+            props.entrySet().forEach((entry) -> {
                 settings.setVariable(getVarName((String) entry.getKey()), (String) entry.getValue());
-            }
+            });
         }
     }
 

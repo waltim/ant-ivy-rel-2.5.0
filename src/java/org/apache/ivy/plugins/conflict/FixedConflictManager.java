@@ -34,12 +34,12 @@ public class FixedConflictManager extends AbstractConflictManager {
 
     public Collection<IvyNode> resolveConflicts(IvyNode parent, Collection<IvyNode> conflicts) {
         Collection<IvyNode> resolved = new ArrayList<>(conflicts.size());
-        for (IvyNode node : conflicts) {
+        conflicts.forEach((node) -> {
             String revision = node.getResolvedId().getRevision();
             if (revisions.contains(revision)) {
                 resolved.add(node);
             }
-        }
+        });
         return resolved;
     }
 

@@ -95,9 +95,9 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
     @Override
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
-        for (DelegatingHandler subHandler : saxHandlerMapping.values()) {
+        saxHandlerMapping.values().forEach((subHandler) -> {
             subHandler.setDocumentLocator(locator);
-        }
+        });
     }
 
     public Locator getLocator() {
@@ -116,18 +116,18 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
 
     public void skip() {
         skip = true;
-        for (DelegatingHandler subHandler : saxHandlerMapping.values()) {
+        saxHandlerMapping.values().forEach((subHandler) -> {
             subHandler.stopDelegating();
-        }
+        });
     }
 
     protected void stopDelegating() {
         parent.delegate = null;
         skip = false;
         started = false;
-        for (DelegatingHandler subHandler : saxHandlerMapping.values()) {
+        saxHandlerMapping.values().forEach((subHandler) -> {
             subHandler.stopDelegating();
-        }
+        });
     }
 
     private interface SkipOnErrorCallback {
@@ -194,10 +194,8 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
         charBuffer.setLength(0);
         if (delegate != null) {
             // we are already delegating, let's continue
-            skipOnError(new SkipOnErrorCallback() {
-                public void call() throws SAXException {
-                    delegate.startElement(uri, localName, n, atts);
-                }
+            skipOnError(() -> {
+                delegate.startElement(uri, localName, n, atts);
             });
         } else {
             if (!started) { // first time called ?
@@ -208,10 +206,8 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
                     throw new SAXException("The root element of the parsed document '" + localName
                             + "' didn't matched the expected one: '" + tagName + "'");
                 }
-                skipOnError(new SkipOnErrorCallback() {
-                    public void call() throws SAXException {
-                        handleAttributes(atts);
-                    }
+                skipOnError(() -> {
+                    handleAttributes(atts);
                 });
                 started = true;
             } else {
@@ -222,10 +218,8 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
                 // time now to delegate for a new element
                 delegate = saxHandlerMapping.get(localName);
                 if (delegate != null) {
-                    skipOnError(new SkipOnErrorCallback() {
-                        public void call() throws SAXException {
-                            delegate.startElement(uri, localName, n, atts);
-                        }
+                    skipOnError(() -> {
+                        delegate.startElement(uri, localName, n, atts);
                     });
                 }
             }
@@ -262,19 +256,15 @@ public class DelegatingHandler extends DefaultHandler implements DTDHandler, Con
         if (delegate != null) {
             final DelegatingHandler savedDelegate = delegate;
             // we are already delegating, let's continue
-            skipOnError(new SkipOnErrorCallback() {
-                public void call() throws SAXException {
-                    delegate.endElement(uri, localName, n);
-                }
+            skipOnError(() -> {
+                delegate.endElement(uri, localName, n);
             });
             if (delegate == null) {
                 // we just stopped delegating, it means that the child has ended
                 final ChildElementHandler<?> childHandler = childHandlerMapping.get(localName);
                 if (childHandler != null) {
-                    skipOnError(new SkipOnErrorCallback() {
-                        public void call() throws SAXException {
-                            childHandler._childHandled(savedDelegate);
-                        }
+                    skipOnError(() -> {
+                        childHandler._childHandled(savedDelegate);
                     });
                 }
             }

@@ -219,9 +219,9 @@ public class FixDepsTaskTest {
 
     private List<String> toString(List<DependencyDescriptor> list) {
         List<String> strings = new ArrayList<>(list.size());
-        for (DependencyDescriptor dd : list) {
+        list.forEach((dd) -> {
             strings.add(dd.toString());
-        }
+        });
         return strings;
     }
 }

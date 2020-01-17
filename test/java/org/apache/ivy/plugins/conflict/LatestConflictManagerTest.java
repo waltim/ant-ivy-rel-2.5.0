@@ -93,13 +93,13 @@ public class LatestConflictManagerTest {
         ResolveReport report = ivy.resolve(
             LatestConflictManagerTest.class.getResource("ivy-383.xml"), getResolveOptions());
         ConfigurationResolveReport defaultReport = report.getConfigurationReport("default");
-        for (ModuleRevisionId mrid : defaultReport.getModuleRevisionIds()) {
+        defaultReport.getModuleRevisionIds().forEach((mrid) -> {
             if (mrid.getName().equals("mod1.1")) {
                 assertEquals("1.0", mrid.getRevision());
             } else if (mrid.getName().equals("mod1.2")) {
                 assertEquals("2.2", mrid.getRevision());
             }
-        }
+        });
     }
 
     /**
@@ -125,13 +125,13 @@ public class LatestConflictManagerTest {
             LatestConflictManagerTest.class.getResource("ivy-latest-time-1.xml"),
             getResolveOptions());
         ConfigurationResolveReport defaultReport = report.getConfigurationReport("default");
-        for (ModuleRevisionId mrid : defaultReport.getModuleRevisionIds()) {
+        defaultReport.getModuleRevisionIds().forEach((mrid) -> {
             if (mrid.getName().equals("mod1.1")) {
                 assertEquals("1.0", mrid.getRevision());
             } else if (mrid.getName().equals("mod1.2")) {
                 assertEquals("2.2", mrid.getRevision());
             }
-        }
+        });
     }
 
     @Test
@@ -151,13 +151,13 @@ public class LatestConflictManagerTest {
             LatestConflictManagerTest.class.getResource("ivy-latest-time-2.xml"),
             getResolveOptions());
         ConfigurationResolveReport defaultReport = report.getConfigurationReport("default");
-        for (ModuleRevisionId mrid : defaultReport.getModuleRevisionIds()) {
+        defaultReport.getModuleRevisionIds().forEach((mrid) -> {
             if (mrid.getName().equals("mod1.1")) {
                 assertEquals("1.0", mrid.getRevision());
             } else if (mrid.getName().equals("mod1.2")) {
                 assertEquals("2.2", mrid.getRevision());
             }
-        }
+        });
     }
 
     /**

@@ -47,9 +47,9 @@ public class UnmodifiableExtendableItem implements ExtendableItem {
             this.attributes.putAll(stdAttributes);
         }
         if (extraAttributes != null) {
-            for (Map.Entry<String, String> extraAtt : extraAttributes.entrySet()) {
+            extraAttributes.entrySet().forEach((extraAtt) -> {
                 setExtraAttribute(extraAtt.getKey(), extraAtt.getValue());
-            }
+            });
         }
     }
 

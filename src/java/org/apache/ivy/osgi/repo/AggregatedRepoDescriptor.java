@@ -76,36 +76,27 @@ public class AggregatedRepoDescriptor extends RepoDescriptor {
     @Override
     public Set<String> getCapabilities() {
         Set<String> ret = new HashSet<>();
-        for (RepoDescriptor repo : repos) {
-            Set<String> capabilities = repo.getCapabilities();
-            if (capabilities != null) {
-                ret.addAll(capabilities);
-            }
-        }
+        repos.stream().map((repo) -> repo.getCapabilities()).filter((capabilities) -> (capabilities != null)).forEachOrdered((capabilities) -> {
+            ret.addAll(capabilities);
+        });
         return ret;
     }
 
     @Override
     public Set<ModuleDescriptorWrapper> findModules(String requirement, String value) {
         Set<ModuleDescriptorWrapper> ret = new HashSet<>();
-        for (RepoDescriptor repo : repos) {
-            Set<ModuleDescriptorWrapper> modules = repo.findModules(requirement, value);
-            if (modules != null) {
-                ret.addAll(modules);
-            }
-        }
+        repos.stream().map((repo) -> repo.findModules(requirement, value)).filter((modules) -> (modules != null)).forEachOrdered((modules) -> {
+            ret.addAll(modules);
+        });
         return ret;
     }
 
     @Override
     public Set<String> getCapabilityValues(String capabilityName) {
         Set<String> ret = new HashSet<>();
-        for (RepoDescriptor repo : repos) {
-            Set<String> capabilityValues = repo.getCapabilityValues(capabilityName);
-            if (capabilityValues != null) {
-                ret.addAll(capabilityValues);
-            }
-        }
+        repos.stream().map((repo) -> repo.getCapabilityValues(capabilityName)).filter((capabilityValues) -> (capabilityValues != null)).forEachOrdered((capabilityValues) -> {
+            ret.addAll(capabilityValues);
+        });
         return ret;
     }
 

@@ -147,11 +147,11 @@ public class IvyRepositoryReport extends IvyTask {
         xslExt.setExpression(xslext);
 
         // add the provided XSLT parameters
-        for (XSLTProcess.Param param : params) {
+        params.forEach((param) -> {
             XSLTProcess.Param realParam = xslt.createParam();
             realParam.setName(param.getName());
             realParam.setExpression(param.getExpression());
-        }
+        });
 
         xslt.execute();
     }

@@ -365,12 +365,12 @@ public final class Main {
             }
 
             StringBuilder sb = new StringBuilder();
-            for (String problem : report.getAllProblemMessages()) {
+            report.getAllProblemMessages().forEach((problem) -> {
                 if (sb.length() > 0) {
                     sb.append("\n");
                 }
                 sb.append(problem);
-            }
+            });
             throw new ResolveProcessException(sb.toString());
         }
         ModuleDescriptor md = report.getModuleDescriptor();
@@ -581,13 +581,13 @@ public final class Main {
 
         // Add option cp (extra classpath) urls
         if (fileList != null && fileList.size() > 0) {
-            for (File file : fileList) {
+            fileList.forEach((file) -> {
                 try {
                     urls.add(file.toURI().toURL());
                 } catch (MalformedURLException e) {
                     // Should not happen, just ignore.
                 }
-            }
+            });
         }
 
         try {

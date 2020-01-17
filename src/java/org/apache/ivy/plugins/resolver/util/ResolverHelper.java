@@ -102,13 +102,15 @@ public final class ResolverHelper {
             }
             Message.debug("\t\tfound " + all.size() + " resources");
             List<String> names = new ArrayList<>(all.size());
-            for (String path : all) {
+            all.stream().map((path) -> {
                 if (path.endsWith(fileSep)) {
                     path = path.substring(0, path.length() - 1);
                 }
+                return path;
+            }).forEachOrdered((path) -> {
                 int slashIndex = path.lastIndexOf(fileSep);
                 names.add(path.substring(slashIndex + 1));
-            }
+            });
             return names.toArray(new String[names.size()]);
         } catch (IOException e) {
             Message.verbose("problem while listing resources in " + parent + " with " + rep, e);
@@ -278,14 +280,9 @@ public final class ResolverHelper {
                             + IvyPatternHelper.substituteToken(namePattern, token, "([^/]+)")
                             + ".*";
                     Pattern p = Pattern.compile(acceptNamePattern);
-                    for (URL url : all) {
-                        String path = standardize(url.getPath());
-                        Matcher m = p.matcher(path);
-                        if (m.matches()) {
-                            String value = m.group(1);
-                            ret.add(value);
-                        }
-                    }
+                    all.stream().map((url) -> standardize(url.getPath())).map((path) -> p.matcher(path)).filter((m) -> (m.matches())).map((m) -> m.group(1)).forEachOrdered((value) -> {
+                        ret.add(value);
+                    });
                     Message.debug("\t\t" + ret.size() + " matched " + pattern);
                     return ret.toArray(new String[ret.size()]);
                 } catch (Exception e) {
@@ -308,14 +305,15 @@ public final class ResolverHelper {
                 List<URL> all = lister.listAll(root);
                 Message.debug("\t\tfound " + all.size() + " urls");
                 List<String> names = new ArrayList<>(all.size());
-                for (URL dir : all) {
-                    String path = dir.getPath();
+                all.stream().map((dir) -> dir.getPath()).map((path) -> {
                     if (path.endsWith("/")) {
                         path = path.substring(0, path.length() - 1);
                     }
+                    return path;
+                }).forEachOrdered((path) -> {
                     int slashIndex = path.lastIndexOf('/');
                     names.add(path.substring(slashIndex + 1));
-                }
+                });
                 return names.toArray(new String[names.size()]);
             }
             return null;

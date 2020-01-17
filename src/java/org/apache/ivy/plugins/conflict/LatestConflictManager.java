@@ -128,9 +128,9 @@ public class LatestConflictManager extends AbstractConflictManager {
 
     protected ArtifactInfo[] toArtifactInfo(Collection<IvyNode> conflicts) {
         List<ArtifactInfo> artifacts = new ArrayList<>(conflicts.size());
-        for (IvyNode node : conflicts) {
+        conflicts.forEach((node) -> {
             artifacts.add(new IvyNodeArtifactInfo(node));
-        }
+        });
         return artifacts.toArray(new ArtifactInfo[artifacts.size()]);
     }
 

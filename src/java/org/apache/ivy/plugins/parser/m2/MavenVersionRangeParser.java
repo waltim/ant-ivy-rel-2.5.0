@@ -192,15 +192,9 @@ class MavenVersionRangeParser {
             if (this.ranges.isEmpty()) {
                 return false;
             }
-            for (final Range range : this.ranges) {
-                if (range == null) {
-                    continue;
-                }
-                // if any range matches, we consider it a match
-                if (range.accepts(value)) {
-                    return true;
-                }
-            }
+            if (this.ranges.stream().filter((range) -> !(range == null)).anyMatch((range) -> (range.accepts(value)))) {
+                return true;
+            } // if any range matches, we consider it a match
             return false;
         }
     }

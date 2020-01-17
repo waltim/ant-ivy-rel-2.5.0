@@ -304,9 +304,9 @@ public class VisitNode {
     public Collection<VisitNode> getDependencies(String conf) {
         Collection<IvyNode> deps = node.getDependencies(rootModuleConf, conf, requestedConf);
         Collection<VisitNode> ret = new ArrayList<>(deps.size());
-        for (IvyNode depNode : deps) {
+        deps.forEach((depNode) -> {
             ret.add(traverseChild(conf, depNode));
-        }
+        });
         return ret;
     }
 
@@ -364,9 +364,9 @@ public class VisitNode {
     private ModuleRevisionId[] toMrids(Collection<VisitNode> path, ModuleRevisionId last) {
         ModuleRevisionId[] ret = new ModuleRevisionId[path.size() + 1];
         int i = 0;
-        for (VisitNode node : path) {
+        path.forEach((node) -> {
             ret[i] = node.getNode().getId();
-        }
+        });
         ret[ret.length - 1] = last;
         return ret;
     }

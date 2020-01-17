@@ -179,7 +179,7 @@ public class RepositoryManagementEngine {
     public void analyze() {
         ensureLoaded();
         Message.info("\nanalyzing dependencies...");
-        for (ModuleDescriptor md : revisions.values()) {
+        revisions.values().stream().map((md) -> {
             for (DependencyDescriptor dd : md.getDependencies()) {
                 ModuleRevisionId dep = getDependency(dd);
                 if (dep == null) {
@@ -188,8 +188,10 @@ public class RepositoryManagementEngine {
                     getDependers(dep).add(md.getModuleRevisionId());
                 }
             }
+            return md;
+        }).forEachOrdered((_item) -> {
             Message.progress();
-        }
+        });
         analyzed = true;
     }
 
@@ -297,14 +299,10 @@ public class RepositoryManagementEngine {
     private Collection<ModuleDescriptor> getAllRevisions(ModuleRevisionId id) {
         Collection<ModuleDescriptor> revisions = modules.get(id.getModuleId());
         if (revisions == null) {
-            revisions = new TreeSet<>(new Comparator<ModuleDescriptor>() {
-                public int compare(ModuleDescriptor md1, ModuleDescriptor md2) {
-                    // we use reverse order compared to latest revision, to have latest revision
-                    // first
-                    return settings.getDefaultLatestStrategy().sort(new ArtifactInfo[] {md1, md2})
-                            .get(0).equals(md1) ? 1 : -1;
-                }
-            });
+            revisions = new TreeSet<>((ModuleDescriptor md1, ModuleDescriptor md2) -> settings.getDefaultLatestStrategy().sort(new ArtifactInfo[] {md1, md2})
+                    .get(0).equals(md1) ? 1 : -1 // we use reverse order compared to latest revision, to have latest revision
+            // first
+            );
             modules.put(id.getModuleId(), revisions);
         }
         return revisions;

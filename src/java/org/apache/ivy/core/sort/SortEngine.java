@@ -65,7 +65,7 @@ public class SortEngine {
 
         Map<ModuleDescriptor, List<IvyNode>> dependenciesMap = new LinkedHashMap<>();
         List<IvyNode> nulls = new ArrayList<>();
-        for (IvyNode node : nodes) {
+        nodes.forEach((node) -> {
             if (node.getDescriptor() == null) {
                 nulls.add(node);
             } else {
@@ -76,16 +76,15 @@ public class SortEngine {
                 }
                 n.add(node);
             }
-        }
+        });
         List<ModuleDescriptor> list = sortModuleDescriptors(dependenciesMap.keySet(), options);
         final double adjustFactor = 1.3;
         List<IvyNode> ret = new ArrayList<>(
                 (int) (list.size() * adjustFactor + nulls.size()));
         // attempt to adjust the size to avoid too much list resizing
-        for (ModuleDescriptor md : list) {
-            List<IvyNode> n = dependenciesMap.get(md);
+        list.stream().map((md) -> dependenciesMap.get(md)).forEachOrdered((n) -> {
             ret.addAll(n);
-        }
+        });
         ret.addAll(0, nulls);
         return ret;
     }

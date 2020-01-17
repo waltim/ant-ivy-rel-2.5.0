@@ -31,9 +31,9 @@ public class AggregatedOSGiResolver extends AbstractOSGiResolver {
     @Override
     protected void init() {
         List<RepoDescriptor> repos = new ArrayList<>();
-        for (AbstractOSGiResolver resolver : resolvers) {
+        resolvers.forEach((resolver) -> {
             repos.add(resolver.getRepoDescriptor());
-        }
+        });
         setRepoDescriptor(new AggregatedRepoDescriptor(repos));
     }
 

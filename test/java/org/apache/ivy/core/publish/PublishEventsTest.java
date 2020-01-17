@@ -255,9 +255,9 @@ public class PublishEventsTest {
         // set an error to be thrown during publication of the data file.
         this.publishError = new IOException("boom!");
         // we don't care which artifact is attempted; either will fail with an IOException.
-        for (PublishTestCase publishTestCase : expectedPublications.values()) {
+        expectedPublications.values().forEach((publishTestCase) -> {
             publishTestCase.expectedSuccess = false;
-        }
+        });
 
         try {
             publishEngine.publish(publishModule.getModuleRevisionId(), publishSources, "default",

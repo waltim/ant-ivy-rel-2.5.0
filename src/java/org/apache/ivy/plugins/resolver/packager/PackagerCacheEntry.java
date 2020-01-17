@@ -155,9 +155,9 @@ public class PackagerCacheEntry {
         project.setUserProperty("ivy.packager.restricted", "" + this.restricted);
         project.setUserProperty("ivy.packager.quiet", String.valueOf(quiet));
         if (properties != null) {
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
+            properties.entrySet().forEach((entry) -> {
                 project.setUserProperty(entry.getKey(), entry.getValue());
-            }
+            });
         }
 
         // Execute task

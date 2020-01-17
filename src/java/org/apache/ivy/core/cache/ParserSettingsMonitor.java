@@ -132,9 +132,9 @@ class ParserSettingsMonitor {
 
         public Map<String, String> substitute(Map<String, String> strings) {
             Map<String, String> substituted = new LinkedHashMap<>();
-            for (Map.Entry<String, String> entry : strings.entrySet()) {
+            strings.entrySet().forEach((entry) -> {
                 substituted.put(entry.getKey(), substitute(entry.getValue()));
-            }
+            });
             return substituted;
         }
 

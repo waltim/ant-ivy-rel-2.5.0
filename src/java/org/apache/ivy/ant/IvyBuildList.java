@@ -298,13 +298,13 @@ public class IvyBuildList extends IvyTask {
         List<ModuleDescriptor> sortedModules = ivy.sortModuleDescriptors(mds, SortOptions.DEFAULT);
 
         if (!OnMissingDescriptor.TAIL.equals(onMissingDescriptor)) {
-            for (File buildFile : noDescriptor) {
+            noDescriptor.forEach((buildFile) -> {
                 addBuildFile(path, buildFile);
-            }
+            });
         }
-        for (File buildFile : independent) {
+        independent.forEach((buildFile) -> {
             addBuildFile(path, buildFile);
-        }
+        });
         if (isReverse()) {
             Collections.reverse(sortedModules);
         }
@@ -335,9 +335,9 @@ public class IvyBuildList extends IvyTask {
             addBuildFile(path, buildFiles.get(md));
         }
         if (OnMissingDescriptor.TAIL.equals(onMissingDescriptor)) {
-            for (File buildFile : noDescriptor) {
+            noDescriptor.forEach((buildFile) -> {
                 addBuildFile(path, buildFile);
-            }
+            });
         }
 
         getProject().addReference(getReference(), path);
@@ -347,7 +347,7 @@ public class IvyBuildList extends IvyTask {
     private Set<MapMatcher> convert(List<BuildListModule> modulesList, String modulesString, IvySettings settings) {
         Set<MapMatcher> result = new LinkedHashSet<>();
 
-        for (BuildListModule module : modulesList) {
+        modulesList.forEach((module) -> {
             File ivyFile = module.getFile();
             if (ivyFile == null) {
                 String org = module.getOrganisation();
@@ -377,7 +377,7 @@ public class IvyBuildList extends IvyTask {
                     throw new BuildException(e);
                 }
             }
-        }
+        });
 
         if (!"*".equals(modulesString)) {
             StringTokenizer st = new StringTokenizer(modulesString, getDelimiter());
@@ -420,18 +420,17 @@ public class IvyBuildList extends IvyTask {
         List<ModuleDescriptor> result = new ArrayList<>();
         Set<MapMatcher> missingMatchers = new HashSet<>(matchers);
 
-        for (ModuleDescriptor md : mds) {
+        mds.forEach((md) -> {
             Map<String, String> attributes = new HashMap<>();
             attributes.putAll(md.getAttributes());
             attributes.put("resource", md.getResource().getName());
-
-            for (MapMatcher matcher : matchers) {
-                if (matcher.matches(attributes)) {
-                    missingMatchers.remove(matcher);
-                    result.add(md);
-                }
-            }
-        }
+            matchers.stream().filter((matcher) -> (matcher.matches(attributes))).map((matcher) -> {
+                missingMatchers.remove(matcher);
+                return matcher;
+            }).forEachOrdered((_item) -> {
+                result.add(md);
+            });
+        });
 
         if (!missingMatchers.isEmpty()) {
             throw new BuildException("unable to find " + kind + " module(s) "
@@ -474,15 +473,17 @@ public class IvyBuildList extends IvyTask {
     private Collection<ModuleDescriptor> filterModulesFromRoot(Collection<ModuleDescriptor> mds,
             List<ModuleDescriptor> rootmds) {
         Map<ModuleId, ModuleDescriptor> moduleIdMap = new HashMap<>();
-        for (ModuleDescriptor md : mds) {
+        mds.forEach((md) -> {
             moduleIdMap.put(md.getModuleRevisionId().getModuleId(), md);
-        }
+        });
 
         // recursively process the nodes
         Set<ModuleDescriptor> toKeep = new LinkedHashSet<>();
 
-        for (ModuleDescriptor rootmd : rootmds) {
+        rootmds.stream().map((rootmd) -> {
             processFilterNodeFromRoot(rootmd, toKeep, moduleIdMap);
+            return rootmd;
+        }).forEachOrdered((rootmd) -> {
             // With the excluderoot attribute set to true, take the rootmd out of the toKeep set.
             if (excludeRoot) {
                 // Only for logging purposes
@@ -491,12 +492,11 @@ public class IvyBuildList extends IvyTask {
             } else {
                 toKeep.add(rootmd);
             }
-        }
-
+        });
         // just for logging
-        for (ModuleDescriptor md : toKeep) {
+        toKeep.forEach((md) -> {
             Message.verbose("Kept module " + md.getModuleRevisionId().getModuleId().getName());
-        }
+        });
 
         return toKeep;
     }
@@ -543,13 +543,13 @@ public class IvyBuildList extends IvyTask {
     private Collection<ModuleDescriptor> filterModulesFromLeaf(Collection<ModuleDescriptor> mds,
             List<ModuleDescriptor> leafmds) {
         Map<ModuleId, ModuleDescriptor> moduleIdMap = new HashMap<>();
-        for (ModuleDescriptor md : mds) {
+        mds.forEach((md) -> {
             moduleIdMap.put(md.getModuleRevisionId().getModuleId(), md);
-        }
+        });
 
         // recursively process the nodes
         Set<ModuleDescriptor> toKeep = new LinkedHashSet<>();
-        for (ModuleDescriptor leafmd : leafmds) {
+        leafmds.stream().map((leafmd) -> {
             // With the excludeleaf attribute set to true, take the rootmd out of the toKeep set.
             if (excludeLeaf) {
                 Message.verbose("Excluded module "
@@ -557,13 +557,14 @@ public class IvyBuildList extends IvyTask {
             } else {
                 toKeep.add(leafmd);
             }
+            return leafmd;
+        }).forEachOrdered((leafmd) -> {
             processFilterNodeFromLeaf(leafmd, toKeep, moduleIdMap);
-        }
-
+        });
         // just for logging
-        for (ModuleDescriptor md : toKeep) {
+        toKeep.forEach((md) -> {
             Message.verbose("Kept module " + md.getModuleRevisionId().getModuleId().getName());
-        }
+        });
 
         return toKeep;
     }
@@ -581,7 +582,7 @@ public class IvyBuildList extends IvyTask {
      */
     private void processFilterNodeFromLeaf(ModuleDescriptor node, Set<ModuleDescriptor> toKeep,
             Map<ModuleId, ModuleDescriptor> moduleIdMap) {
-        for (ModuleDescriptor md : moduleIdMap.values()) {
+        moduleIdMap.values().forEach((md) -> {
             for (DependencyDescriptor dep : md.getDependencies()) {
                 if (node.getModuleRevisionId().getModuleId().equals(dep.getDependencyId())
                         && !toKeep.contains(md)) {
@@ -591,7 +592,7 @@ public class IvyBuildList extends IvyTask {
                     }
                 }
             }
-        }
+        });
     }
 
     private void addBuildFile(Path path, File buildFile) {

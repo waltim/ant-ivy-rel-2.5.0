@@ -161,12 +161,12 @@ public class OBRXMLWriter {
                 Set<String> uses = ((ExportPackage) capability).getUses();
                 if (uses != null && !uses.isEmpty()) {
                     StringBuilder builder = new StringBuilder();
-                    for (String use : uses) {
+                    uses.forEach((use) -> {
                         if (builder.length() != 0) {
                             builder.append(',');
                         }
                         builder.append(use);
-                    }
+                    });
                     saxCapabilityProperty("uses", builder.toString(), handler);
                 }
                 break;

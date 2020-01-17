@@ -83,22 +83,20 @@ public class P2Descriptor extends EditableRepoDescriptor {
         if (bundleIds == null) {
             return;
         }
-        for (String bundleId : bundleIds) {
-            for (ModuleDescriptorWrapper mdw : findModules(BundleInfo.BUNDLE_TYPE, bundleId)) {
+        bundleIds.forEach((bundleId) -> {
+            findModules(BundleInfo.BUNDLE_TYPE, bundleId).forEach((mdw) -> {
                 String symbolicName = mdw.getBundleInfo().getSymbolicName();
                 Map<Version, BundleInfo> byVersion = sourceTargetBundles.get(symbolicName);
-                if (byVersion == null) {
-                    continue;
+                if (!(byVersion == null)) {
+                    BundleInfo source = byVersion.get(mdw.getBundleInfo().getVersion());
+                    if (!(source == null)) {
+                        source.getArtifacts().forEach((artifact) -> {
+                            mdw.getBundleInfo().addArtifact(artifact);
+                        });
+                    }
                 }
-                BundleInfo source = byVersion.get(mdw.getBundleInfo().getVersion());
-                if (source == null) {
-                    continue;
-                }
-                for (BundleArtifact artifact : source.getArtifacts()) {
-                    mdw.getBundleInfo().addArtifact(artifact);
-                }
-            }
-        }
+            });
+        });
         sourceTargetBundles = null;
     }
 

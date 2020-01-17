@@ -88,9 +88,9 @@ public class RetrieveTest {
             systemHasSymlinkAbility = false;
         }
         // delete on exit, the tmp files we created
-        for (final File file : tmpFilesCreated) {
+        tmpFilesCreated.forEach((file) -> {
             file.deleteOnExit();
-        }
+        });
     }
 
     @Before

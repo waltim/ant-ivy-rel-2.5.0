@@ -31,12 +31,12 @@ public class MapMatcher {
     public MapMatcher(Map<String, String> attributes, PatternMatcher pm) {
         this.attributes = attributes;
         this.pm = pm;
-        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+        attributes.entrySet().forEach((entry) -> {
             String value = entry.getValue();
             if (value != null) {
                 matchers.put(entry.getKey(), pm.getMatcher(value));
             }
-        }
+        });
     }
 
     public boolean matches(Map<String, String> m) {

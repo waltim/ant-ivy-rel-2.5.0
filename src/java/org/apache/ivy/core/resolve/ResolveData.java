@@ -82,9 +82,9 @@ public class ResolveData {
 
     public Collection<IvyNode> getNodes() {
         Collection<IvyNode> nodes = new ArrayList<>();
-        for (VisitData vdata : visitData.values()) {
+        visitData.values().forEach((vdata) -> {
             nodes.add(vdata.getNode());
-        }
+        });
         return nodes;
     }
 

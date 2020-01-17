@@ -78,13 +78,13 @@ public class StatusManager {
             throw new IllegalStateException("badly configured statuses: none found");
         }
         statusPriorityMap = new HashMap<>();
-        for (Status status : statuses) {
+        statuses.forEach((status) -> {
             statusPriorityMap.put(status.getName(), statuses.indexOf(status));
-        }
+        });
         statusIntegrationMap = new HashMap<>();
-        for (Status status : statuses) {
+        statuses.forEach((status) -> {
             statusIntegrationMap.put(status.getName(), status.isIntegration());
-        }
+        });
     }
 
     public boolean isStatus(String status) {
@@ -121,11 +121,9 @@ public class StatusManager {
     public String getDeliveryStatusListString() {
         if (deliveryStatusListString == null) {
             StringBuilder ret = new StringBuilder();
-            for (Status status : statuses) {
-                if (!status.isIntegration()) {
-                    ret.append(status.getName()).append(",");
-                }
-            }
+            statuses.stream().filter((status) -> (!status.isIntegration())).forEachOrdered((status) -> {
+                ret.append(status.getName()).append(",");
+            });
             if (ret.length() > 0) {
                 ret.deleteCharAt(ret.length() - 1);
             }

@@ -58,9 +58,9 @@ public class EncryptedProperties extends Properties {
 
     public Collection<Object> values() {
         List<Object> ret = new LinkedList<>(super.values());
-        for (Object value : ret) {
+        ret.forEach((value) -> {
             ret.set(ret.indexOf(value), StringUtils.decrypt((String) value));
-        }
+        });
         return ret;
     }
 }

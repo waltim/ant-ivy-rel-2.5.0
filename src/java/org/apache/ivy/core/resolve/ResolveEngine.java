@@ -621,11 +621,9 @@ public class ResolveEngine {
             Collection<IvyNode> nodes = data.getNodes();
             // use a Set to avoid duplicates, linked to preserve order
             Collection<IvyNode> dependencies = new LinkedHashSet<>(nodes.size());
-            for (IvyNode node : nodes) {
-                if (node != null && !node.isRoot() && !node.isCompletelyBlacklisted()) {
-                    dependencies.add(node);
-                }
-            }
+            nodes.stream().filter((node) -> (node != null && !node.isRoot() && !node.isCompletelyBlacklisted())).forEachOrdered((node) -> {
+                dependencies.add(node);
+            });
             List<IvyNode> sortedDependencies = sortEngine.sortNodes(dependencies,
                 SortOptions.SILENT);
             Collections.reverse(sortedDependencies);
@@ -739,7 +737,7 @@ public class ResolveEngine {
             // update selected nodes with confs asked in evicted one
             EvictionData ed = node.getEvictedData();
             if (ed.getSelected() != null) {
-                for (IvyNode selected : ed.getSelected()) {
+                ed.getSelected().forEach((selected) -> {
                     if (!selected.isLoaded()) {
                         // the node is not yet loaded, we can simply update its set of
                         // configurations to fetch
@@ -749,7 +747,7 @@ public class ResolveEngine {
                         // required conf
                         fetchDependencies(node.gotoNode(selected), conf, fetchedSet, true);
                     }
-                }
+                });
             }
         }
         if (settings.debugConflictResolution()) {
@@ -791,25 +789,27 @@ public class ResolveEngine {
 
         // now we can actually resolve this configuration dependencies
         if (!isDependenciesFetched(node.getNode(), conf, fetchedSet) && node.isTransitive()) {
-            for (VisitNode dep : node.getDependencies(conf)) {
+            node.getDependencies(conf).stream().map((dep) -> {
                 dep.useRealNode(); // the node may have been resolved to another real one while
+                return dep;
+            }).map((dep) -> {
                 // resolving other deps
                 for (String rconf : dep.getRequiredConfigurations(node, conf)) {
                     fetchDependencies(dep, rconf, fetchedSet, true);
                 }
-                if (!dep.isEvicted() && !dep.hasProblem()) {
-                    // if there are still confs to fetch (usually because they have
-                    // been updated when evicting another module), we fetch them now
-                    for (String fconf : dep.getConfsToFetch()) {
-                        // shouldBeFixed=false to because some of those dependencies might
-                        // be private when they were actually extending public conf.
-                        // Should we keep two list of confs to fetch (private&public)?
-                        // I don't think, visibility is already checked, and a change in the
-                        // configuration between version might anyway have worse problems.
-                        fetchDependencies(dep, fconf, fetchedSet, false);
-                    }
+                return dep;
+            }).filter((dep) -> (!dep.isEvicted() && !dep.hasProblem())).forEachOrdered((dep) -> {
+                // if there are still confs to fetch (usually because they have
+                // been updated when evicting another module), we fetch them now
+                for (String fconf : dep.getConfsToFetch()) {
+                    // shouldBeFixed=false to because some of those dependencies might
+                    // be private when they were actually extending public conf.
+                    // Should we keep two list of confs to fetch (private&public)?
+                    // I don't think, visibility is already checked, and a change in the
+                    // configuration between version might anyway have worse problems.
+                    fetchDependencies(dep, fconf, fetchedSet, false);
                 }
-            }
+            });
             markDependenciesFetched(node.getNode(), conf, fetchedSet);
         }
         // we have finished with this configuration, if it was the original requested conf
@@ -1101,13 +1101,15 @@ public class ResolveEngine {
                     node.getRootModuleConf(),
                     ancestor.getNode().getConfigurations(node.getRootModuleConf()),
                     ancestor.getRequestedConf());
-                for (IvyNode dep : deps) {
+                deps.stream().map((dep) -> {
                     if (dep.getModuleId().equals(node.getModuleId())) {
                         conflicts.add(dep);
                     }
+                    return dep;
+                }).forEachOrdered((dep) -> {
                     conflicts.addAll(dep.getResolvedNodes(node.getModuleId(),
-                        node.getRootModuleConf()));
-                }
+                            node.getRootModuleConf()));
+                });
             } finally {
                 data.setCurrentVisitNode(oldVisitNode);
             }
@@ -1122,11 +1124,9 @@ public class ResolveEngine {
                 node.getRootModuleConf(),
                 parent.getNode().getConfigurations(node.getRootModuleConf()),
                 parent.getRequestedConf());
-            for (IvyNode parentDep : parentDepIvyNodes) {
-                if (parentDep.getModuleId().equals(node.getModuleId())) {
-                    conflicts.add(parentDep);
-                }
-            }
+            parentDepIvyNodes.stream().filter((parentDep) -> (parentDep.getModuleId().equals(node.getModuleId()))).forEachOrdered((parentDep) -> {
+                conflicts.add(parentDep);
+            });
         } else {
             conflicts.addAll(selectedNodes);
         }

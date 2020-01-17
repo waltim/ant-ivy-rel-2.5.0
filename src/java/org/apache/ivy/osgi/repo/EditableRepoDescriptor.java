@@ -130,9 +130,9 @@ public class EditableRepoDescriptor extends RepoDescriptor {
         ModuleDescriptorWrapper md = new ModuleDescriptorWrapper(bundleInfo, baseUri,
                 profileProvider);
         add(BundleInfo.BUNDLE_TYPE, bundleInfo.getSymbolicName(), md);
-        for (BundleCapability capability : bundleInfo.getCapabilities()) {
+        bundleInfo.getCapabilities().forEach((capability) -> {
             add(capability.getType(), capability.getName(), md);
-        }
+        });
     }
 
     @Override

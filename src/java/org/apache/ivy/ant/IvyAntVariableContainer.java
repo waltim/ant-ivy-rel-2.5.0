@@ -73,12 +73,12 @@ class IvyAntVariableContainer extends IvyVariableContainerImpl implements IvyVar
     public void updateProject(String id) {
         Map<String, String> r = new HashMap<>(super.getVariables());
         r.putAll(overwrittenProperties);
-        for (Map.Entry<String, String> entry : r.entrySet()) {
+        r.entrySet().stream().map((entry) -> {
             setPropertyIfNotSet(entry.getKey(), entry.getValue());
-            if (id != null) {
-                setPropertyIfNotSet(entry.getKey() + "." + id, entry.getValue());
-            }
-        }
+            return entry;
+        }).filter((entry) -> (id != null)).forEachOrdered((entry) -> {
+            setPropertyIfNotSet(entry.getKey() + "." + id, entry.getValue());
+        });
 
         if (getEnvironmentPrefix() != null) {
             Property propTask = new Property();

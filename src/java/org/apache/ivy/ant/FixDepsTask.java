@@ -74,9 +74,9 @@ public class FixDepsTask extends IvyPostResolveTask {
         ResolveReport report = getResolvedReport();
 
         List<ModuleId> midToKeep = new ArrayList<>();
-        for (Keep keep : keeps) {
+        keeps.forEach((keep) -> {
             midToKeep.add(ModuleId.newInstance(keep.org, keep.module));
-        }
+        });
 
         ModuleDescriptor md = report.toFixedModuleDescriptor(getSettings(), midToKeep);
         try {

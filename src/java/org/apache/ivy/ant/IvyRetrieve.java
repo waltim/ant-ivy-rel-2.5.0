@@ -120,9 +120,9 @@ public class IvyRetrieve extends IvyPostResolveTask {
                 Path path = new Path(getProject());
                 getProject().addReference(getPathId(), path);
 
-                for (File file : report.getRetrievedFiles()) {
+                report.getRetrievedFiles().forEach((file) -> {
                     path.createPathElement().setLocation(file);
-                }
+                });
             }
 
             if (getSetId() != null) {
@@ -132,10 +132,10 @@ public class IvyRetrieve extends IvyPostResolveTask {
 
                 fileset.setDir(report.getRetrieveRoot());
 
-                for (File file : report.getRetrievedFiles()) {
+                report.getRetrievedFiles().forEach((file) -> {
                     PatternSet.NameEntry ne = fileset.createInclude();
                     ne.setName(getPath(report.getRetrieveRoot(), file));
-                }
+                });
             }
         } catch (Exception ex) {
             throw new BuildException("impossible to ivy retrieve: " + ex, ex);

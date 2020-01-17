@@ -82,9 +82,9 @@ public class SortTest {
         DefaultModuleDescriptor[][] expectedOrder = new DefaultModuleDescriptor[][] {
                 {md1, md2, md3, md4}};
 
-        for (List<ModuleDescriptor> toSort : getAllLists(md1, md3, md2, md4)) {
+        getAllLists(md1, md3, md2, md4).forEach((toSort) -> {
             assertSorted(expectedOrder, sortModuleDescriptors(toSort, nonMatchReporter));
-        }
+        });
     }
 
     /**
@@ -103,9 +103,9 @@ public class SortTest {
                 {md2, md3, md4, md1}, {md3, md4, md1, md2}, {md4, md1, md2, md3},
                 {md1, md2, md3, md4}};
 
-        for (List<ModuleDescriptor> toSort : getAllLists(md1, md3, md2, md4)) {
+        getAllLists(md1, md3, md2, md4).forEach((toSort) -> {
             assertSorted(possibleOrder, sortModuleDescriptors(toSort, nonMatchReporter));
-        }
+        });
     }
 
     @Test
@@ -119,9 +119,9 @@ public class SortTest {
                 // {md3, md1, md2, md4}
                 // we don't have this solution. The loops appear has one contiguous element.
         };
-        for (List<ModuleDescriptor> toSort : getAllLists(md1, md3, md2, md4)) {
+        getAllLists(md1, md3, md2, md4).forEach((toSort) -> {
             assertSorted(possibleOrder, sortModuleDescriptors(toSort, nonMatchReporter));
-        }
+        });
     }
 
     /**
@@ -204,9 +204,9 @@ public class SortTest {
         DefaultModuleDescriptor[][] expectedOrder = new DefaultModuleDescriptor[][] {
                 {md1, md2, md3, md4}};
 
-        for (List<ModuleDescriptor> toSort : getAllLists(md1, md3, md2, md4)) {
+        getAllLists(md1, md3, md2, md4).forEach((toSort) -> {
             assertSorted(expectedOrder, sortModuleDescriptors(toSort, nonMatchReporter));
-        }
+        });
     }
 
     /**
@@ -228,9 +228,9 @@ public class SortTest {
         DefaultModuleDescriptor[][] possibleOrder = new DefaultModuleDescriptor[][] {
                 {md1, md2, md3, md4}};
 
-        for (List<ModuleDescriptor> toSort : getAllLists(md1, md3, md2, md4)) {
+        getAllLists(md1, md3, md2, md4).forEach((toSort) -> {
             assertSorted(possibleOrder, sortModuleDescriptors(toSort, nonMatchReporter));
-        }
+        });
     }
 
     /**

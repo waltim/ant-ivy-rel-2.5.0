@@ -160,23 +160,18 @@ public class IvyDependency {
             dd.addDependencyConfiguration(masterConf, "*");
         }
 
-        for (IvyDependencyConf c : confs) {
+        confs.forEach((c) -> {
             c.addConf(dd, masterConf);
-        }
-
-        for (IvyDependencyArtifact artifact : artifacts) {
+        });
+        artifacts.forEach((artifact) -> {
             artifact.addArtifact(dd, masterConf);
-        }
-
-        for (IvyDependencyExclude exclude : excludes) {
-            DefaultExcludeRule rule = exclude.asRule(settings);
+        });
+        excludes.stream().map((exclude) -> exclude.asRule(settings)).forEachOrdered((rule) -> {
             dd.addExcludeRule(masterConf, rule);
-        }
-
-        for (IvyDependencyInclude include : includes) {
-            DefaultIncludeRule rule = include.asRule(settings);
+        });
+        includes.stream().map((include) -> include.asRule(settings)).forEachOrdered((rule) -> {
             dd.addIncludeRule(masterConf, rule);
-        }
+        });
 
         return dd;
     }

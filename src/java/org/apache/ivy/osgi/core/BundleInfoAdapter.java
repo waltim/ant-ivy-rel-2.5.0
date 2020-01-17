@@ -101,11 +101,15 @@ public class BundleInfoAdapter {
         md.addConfiguration(CONF_TRANSITIVE_OPTIONAL);
 
         Set<String> exportedPkgNames = new HashSet<>(bundle.getExports().size());
-        for (ExportPackage exportPackage : bundle.getExports()) {
+        bundle.getExports().stream().map((exportPackage) -> {
             md.getExtraInfos().add(
-                new ExtraInfoHolder(EXTRA_INFO_EXPORT_PREFIX + exportPackage.getName(),
-                        exportPackage.getVersion().toString()));
+                    new ExtraInfoHolder(EXTRA_INFO_EXPORT_PREFIX + exportPackage.getName(),
+                            exportPackage.getVersion().toString()));
+            return exportPackage;
+        }).map((exportPackage) -> {
             exportedPkgNames.add(exportPackage.getName());
+            return exportPackage;
+        }).forEachOrdered((exportPackage) -> {
             String[] confDependencies = new String[exportPackage.getUses().size() + 1];
             int i = 0;
             for (String use : exportPackage.getUses()) {
@@ -115,12 +119,12 @@ public class BundleInfoAdapter {
             md.addConfiguration(new Configuration(CONF_USE_PREFIX + exportPackage.getName(),
                     PUBLIC, "Exported package " + exportPackage.getName(),
                     confDependencies, true, null));
-        }
+        });
 
         requirementAsDependency(md, bundle, exportedPkgNames);
 
         if (baseUri != null) {
-            for (BundleArtifact bundleArtifact : bundle.getArtifacts()) {
+            bundle.getArtifacts().forEach((bundleArtifact) -> {
                 String type = "jar";
                 String ext = "jar";
                 String packaging = null;
@@ -141,38 +145,40 @@ public class BundleInfoAdapter {
                 URI uri = bundleArtifact.getUri();
                 if (uri != null) {
                     DefaultArtifact artifact = buildArtifact(mrid, baseUri, uri, type, ext,
-                        packaging);
+                            packaging);
                     md.addArtifact(CONF_NAME_DEFAULT, artifact);
                 }
-            }
+            });
         }
 
         if (profileProvider != null) {
-            for (String env : bundle.getExecutionEnvironments()) {
+            bundle.getExecutionEnvironments().stream().map((env) -> {
                 ExecutionEnvironmentProfile profile = profileProvider.getProfile(env);
                 if (profile == null) {
                     throw new ProfileNotFoundException("Execution environment profile " + env
                             + " not found");
                 }
-                for (String pkg : profile.getPkgNames()) {
-                    ArtifactId id = new ArtifactId(ModuleId.newInstance(BundleInfo.PACKAGE_TYPE,
+                return profile;
+            }).forEachOrdered((profile) -> {
+                profile.getPkgNames().stream().map((pkg) -> new ArtifactId(ModuleId.newInstance(BundleInfo.PACKAGE_TYPE,
                         pkg), PatternMatcher.ANY_EXPRESSION, PatternMatcher.ANY_EXPRESSION,
-                            PatternMatcher.ANY_EXPRESSION);
-                    DefaultExcludeRule rule = new DefaultExcludeRule(id,
-                            ExactOrRegexpPatternMatcher.INSTANCE, null);
-                    for (String conf : md.getConfigurationsNames()) {
-                        rule.addConfiguration(conf);
-                    }
+                        PatternMatcher.ANY_EXPRESSION)).map((id) -> new DefaultExcludeRule(id,
+                                ExactOrRegexpPatternMatcher.INSTANCE, null)).map((rule) -> {
+                                    for (String conf : md.getConfigurationsNames()) {
+                                        rule.addConfiguration(conf);
+                                    }
+                    return rule;
+                }).forEachOrdered((rule) -> {
                     md.addExcludeRule(rule);
-                }
-            }
+                });
+            });
         }
 
         if (manifest != null) {
-            for (Map.Entry<Object, Object> entries : manifest.getMainAttributes().entrySet()) {
+            manifest.getMainAttributes().entrySet().forEach((entries) -> {
                 md.addExtraInfo(new ExtraInfoHolder(entries.getKey().toString(), entries.getValue()
                         .toString()));
-            }
+            });
         }
 
         return md;
@@ -207,9 +213,9 @@ public class BundleInfoAdapter {
         confs.add(CONF_NAME_OPTIONAL);
         confs.add(CONF_NAME_TRANSITIVE_OPTIONAL);
 
-        for (ExportPackage exportPackage : bundle.getExports()) {
+        bundle.getExports().forEach((exportPackage) -> {
             confs.add(CONF_USE_PREFIX + exportPackage.getName());
-        }
+        });
 
         return confs;
     }
@@ -296,42 +302,37 @@ public class BundleInfoAdapter {
 
     private static void requirementAsDependency(DefaultModuleDescriptor md, BundleInfo bundleInfo,
             Set<String> exportedPkgNames) {
-        for (BundleRequirement requirement : bundleInfo.getRequirements()) {
+        bundleInfo.getRequirements().forEach((requirement) -> {
             String type = requirement.getType();
+            // don't declare package exported by the current bundle
+            // execution environment are handled elsewhere
             String name = requirement.getName();
-
-            if (BundleInfo.PACKAGE_TYPE.equals(type) && exportedPkgNames.contains(name)) {
-                // don't declare package exported by the current bundle
-                continue;
+            if (!(BundleInfo.PACKAGE_TYPE.equals(type) && exportedPkgNames.contains(name))) {
+                if (!(BundleInfo.EXECUTION_ENVIRONMENT_TYPE.equals(type))) {
+                    ModuleRevisionId ddmrid = asMrid(type, name, requirement.getVersion());
+                    DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(ddmrid, false);
+                    
+                    String conf = CONF_NAME_DEFAULT;
+                    if (BundleInfo.PACKAGE_TYPE.equals(type)) {
+                        // declare the configuration for the package
+                        conf = CONF_USE_PREFIX + name;
+                        md.addConfiguration(new Configuration(CONF_USE_PREFIX + name, PUBLIC,
+                                "Exported package " + name, new String[] {CONF_NAME_DEFAULT}, true, null));
+                        dd.addDependencyConfiguration(conf, conf);
+                    }
+                    
+                    if ("optional".equals(requirement.getResolution())) {
+                        dd.addDependencyConfiguration(CONF_NAME_OPTIONAL, conf);
+                        dd.addDependencyConfiguration(CONF_NAME_TRANSITIVE_OPTIONAL,
+                                CONF_NAME_TRANSITIVE_OPTIONAL);
+                    } else {
+                        dd.addDependencyConfiguration(CONF_NAME_DEFAULT, conf);
+                    }
+                    
+                    md.addDependency(dd);
+                }
             }
-
-            if (BundleInfo.EXECUTION_ENVIRONMENT_TYPE.equals(type)) {
-                // execution environment are handled elsewhere
-                continue;
-            }
-
-            ModuleRevisionId ddmrid = asMrid(type, name, requirement.getVersion());
-            DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(ddmrid, false);
-
-            String conf = CONF_NAME_DEFAULT;
-            if (BundleInfo.PACKAGE_TYPE.equals(type)) {
-                // declare the configuration for the package
-                conf = CONF_USE_PREFIX + name;
-                md.addConfiguration(new Configuration(CONF_USE_PREFIX + name, PUBLIC,
-                        "Exported package " + name, new String[] {CONF_NAME_DEFAULT}, true, null));
-                dd.addDependencyConfiguration(conf, conf);
-            }
-
-            if ("optional".equals(requirement.getResolution())) {
-                dd.addDependencyConfiguration(CONF_NAME_OPTIONAL, conf);
-                dd.addDependencyConfiguration(CONF_NAME_TRANSITIVE_OPTIONAL,
-                    CONF_NAME_TRANSITIVE_OPTIONAL);
-            } else {
-                dd.addDependencyConfiguration(CONF_NAME_DEFAULT, conf);
-            }
-
-            md.addDependency(dd);
-        }
+        });
 
     }
 

@@ -162,10 +162,10 @@ public class IvyInfo extends IvyTask {
                 Long.toString(md.getPublicationDate().getTime()));
         }
 
-        for (Map.Entry<String, String> entry : mrid.getExtraAttributes().entrySet()) {
+        mrid.getExtraAttributes().entrySet().forEach((entry) -> {
             getProject().setProperty(property + ".extra." + entry.getKey(),
                     entry.getValue());
-        }
+        });
 
         getProject().setProperty(property + ".configurations",
             mergeConfs(md.getConfigurationsNames()));
@@ -187,18 +187,17 @@ public class IvyInfo extends IvyTask {
         getProject().setProperty(property + ".public.configurations", mergeConfs(publicConfigs));
 
         List<Artifact> artifacts = Arrays.asList(md.getAllArtifacts());
-        for (Artifact artifact : artifacts) {
+        artifacts.forEach((artifact) -> {
             int id = artifacts.indexOf(artifact) + 1;
             getProject().setProperty(property + ".artifact." + id + ".name", artifact.getName());
             getProject().setProperty(property + ".artifact." + id + ".type", artifact.getType());
             getProject().setProperty(property + ".artifact." + id + ".ext", artifact.getExt());
             getProject().setProperty(property + ".artifact." + id + ".conf",
-                mergeConfs(artifact.getConfigurations()));
-
-            for (Map.Entry<String, String> entry : artifact.getExtraAttributes().entrySet()) {
+                    mergeConfs(artifact.getConfigurations()));
+            artifact.getExtraAttributes().entrySet().forEach((entry) -> {
                 getProject().setProperty(property + ".artifact." + id + ".extra." + entry.getKey(),
-                    entry.getValue());
-            }
-        }
+                        entry.getValue());
+            });
+        });
     }
 }

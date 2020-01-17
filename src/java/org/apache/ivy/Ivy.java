@@ -306,27 +306,25 @@ public class Ivy {
                         resolveEngine);
             }
 
-            eventManager.addTransferListener(new TransferListener() {
-                public void transferProgress(TransferEvent evt) {
-                    ResolveData resolve;
-                    switch (evt.getEventType()) {
-                        case TransferEvent.TRANSFER_PROGRESS:
-                            resolve = IvyContext.getContext().getResolveData();
-                            if (resolve == null
-                                    || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
-                                Message.progress();
-                            }
-                            break;
-                        case TransferEvent.TRANSFER_COMPLETED:
-                            resolve = IvyContext.getContext().getResolveData();
-                            if (resolve == null
-                                    || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
-                                Message.endProgress(" (" + (evt.getTotalLength() / KILO) + "kB)");
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+            eventManager.addTransferListener((TransferEvent evt) -> {
+                ResolveData resolve;
+                switch (evt.getEventType()) {
+                    case TransferEvent.TRANSFER_PROGRESS:
+                        resolve = IvyContext.getContext().getResolveData();
+                        if (resolve == null
+                                || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
+                            Message.progress();
+                        }
+                        break;
+                    case TransferEvent.TRANSFER_COMPLETED:
+                        resolve = IvyContext.getContext().getResolveData();
+                        if (resolve == null
+                                || !LogOptions.LOG_QUIET.equals(resolve.getOptions().getLog())) {
+                            Message.endProgress(" (" + (evt.getTotalLength() / KILO) + "kB)");
+                        }
+                        break;
+                    default:
+                        break;
                 }
             });
 
@@ -843,15 +841,12 @@ public class Ivy {
 
     private void postConfigure() {
         List<Trigger> triggers = settings.getTriggers();
-        for (Trigger trigger : triggers) {
+        triggers.forEach((trigger) -> {
             eventManager.addIvyListener(trigger, trigger.getEventFilter());
-        }
-
-        for (DependencyResolver resolver : settings.getResolvers()) {
-            if (resolver instanceof BasicResolver) {
-                ((BasicResolver) resolver).setEventManager(eventManager);
-            }
-        }
+        });
+        settings.getResolvers().stream().filter((resolver) -> (resolver instanceof BasicResolver)).forEachOrdered((resolver) -> {
+            ((BasicResolver) resolver).setEventManager(eventManager);
+        });
     }
 
     public String getVariable(String name) {

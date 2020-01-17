@@ -104,9 +104,9 @@ public class BuildOBRTask extends IvyCacheTask {
         if (getType() != null && !getType().equals("*") && sourceTypes != null
                 && !sourceTypes.isEmpty()) {
             StringBuilder buffer = new StringBuilder(getType());
-            for (String sourceType : sourceTypes) {
+            sourceTypes.forEach((sourceType) -> {
                 buffer.append(",").append(sourceType);
-            }
+            });
             setType(buffer.toString());
         }
     }

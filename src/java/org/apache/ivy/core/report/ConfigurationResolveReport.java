@@ -125,11 +125,9 @@ public class ConfigurationResolveReport {
      */
     public Set<ModuleRevisionId> getModuleRevisionIds() {
         Set<ModuleRevisionId> mrids = new LinkedHashSet<>();
-        for (IvyNode node : getDependencies()) {
-            if (!node.isEvicted(getConfiguration()) && !node.hasProblem()) {
-                mrids.add(node.getResolvedId());
-            }
-        }
+        getDependencies().stream().filter((node) -> (!node.isEvicted(getConfiguration()) && !node.hasProblem())).forEachOrdered((node) -> {
+            mrids.add(node.getResolvedId());
+        });
         return mrids;
     }
 
@@ -176,11 +174,9 @@ public class ConfigurationResolveReport {
 
     public IvyNode[] getUnresolvedDependencies() {
         List<IvyNode> unresolved = new ArrayList<>();
-        for (IvyNode node : getDependencies()) {
-            if (node.hasProblem()) {
-                unresolved.add(node);
-            }
-        }
+        getDependencies().stream().filter((node) -> (node.hasProblem())).forEachOrdered((node) -> {
+            unresolved.add(node);
+        });
         return unresolved.toArray(new IvyNode[unresolved.size()]);
     }
 
@@ -190,11 +186,9 @@ public class ConfigurationResolveReport {
 
     public IvyNode[] getEvictedNodes() {
         List<IvyNode> evicted = new ArrayList<>();
-        for (IvyNode node : getDependencies()) {
-            if (node.isEvicted(conf)) {
-                evicted.add(node);
-            }
-        }
+        getDependencies().stream().filter((node) -> (node.isEvicted(conf))).forEachOrdered((node) -> {
+            evicted.add(node);
+        });
         return evicted.toArray(new IvyNode[evicted.size()]);
     }
 
@@ -208,21 +202,17 @@ public class ConfigurationResolveReport {
 
     public IvyNode[] getDownloadedNodes() {
         List<IvyNode> downloaded = new ArrayList<>();
-        for (IvyNode node : getDependencies()) {
-            if (node.isDownloaded() && node.getRealNode() == node) {
-                downloaded.add(node);
-            }
-        }
+        getDependencies().stream().filter((node) -> (node.isDownloaded() && node.getRealNode() == node)).forEachOrdered((node) -> {
+            downloaded.add(node);
+        });
         return downloaded.toArray(new IvyNode[downloaded.size()]);
     }
 
     public IvyNode[] getSearchedNodes() {
         List<IvyNode> downloaded = new ArrayList<>();
-        for (IvyNode node : getDependencies()) {
-            if (node.isSearched() && node.getRealNode() == node) {
-                downloaded.add(node);
-            }
-        }
+        getDependencies().stream().filter((node) -> (node.isSearched() && node.getRealNode() == node)).forEachOrdered((node) -> {
+            downloaded.add(node);
+        });
         return downloaded.toArray(new IvyNode[downloaded.size()]);
     }
 
@@ -248,7 +238,7 @@ public class ConfigurationResolveReport {
             List<IvyNode> sortedDependencies = resolveEngine.getSortEngine().sortNodes(
                 getDependencies(), SortOptions.SILENT);
             Collections.reverse(sortedDependencies);
-            for (IvyNode dependency : sortedDependencies) {
+            sortedDependencies.forEach((dependency) -> {
                 ModuleId mid = dependency.getResolvedId().getModuleId();
                 Collection<IvyNode> deps = modulesIdsMap.get(mid);
                 if (deps == null) {
@@ -256,7 +246,7 @@ public class ConfigurationResolveReport {
                     modulesIdsMap.put(mid, deps);
                 }
                 deps.add(dependency);
-            }
+            });
             modulesIds = new ArrayList<>(modulesIdsMap.keySet());
         }
         return Collections.unmodifiableList(modulesIds);
@@ -275,9 +265,7 @@ public class ConfigurationResolveReport {
 
     public int getArtifactsNumber() {
         int total = 0;
-        for (Collection<ArtifactDownloadReport> reports : dependencyReports.values()) {
-            total += reports == null ? 0 : reports.size();
-        }
+        total = dependencyReports.values().stream().map((reports) -> reports == null ? 0 : reports.size()).reduce(total, Integer::sum);
         return total;
     }
 

@@ -82,9 +82,9 @@ public class PackagerResolver extends URLResolver {
         if (this.preserve) {
             return;
         }
-        for (PackagerCacheEntry entry : packagerCache.values()) {
+        packagerCache.values().forEach((entry) -> {
             entry.cleanup();
-        }
+        });
         packagerCache.clear();
         if (this.buildRoot != null) {
             FileUtil.forceDelete(this.buildRoot);

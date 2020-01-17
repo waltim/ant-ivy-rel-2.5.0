@@ -201,15 +201,14 @@ public class XmlReportParser {
             public void endElement(String uri, String localName, String qname) throws SAXException {
                 if ("dependencies".equals(qname)) {
                     // add the artifacts in the correct order
-                    for (List<ArtifactDownloadReport> artifactReports : revisionsMap.values()) {
+                    revisionsMap.values().stream().map((artifactReports) -> {
                         SaxXmlReportParser.this.artifactReports.addAll(artifactReports);
-                        for (ArtifactDownloadReport artifactReport : artifactReports) {
-                            if (artifactReport.getDownloadStatus() != DownloadStatus.FAILED) {
-                                artifacts.add(artifactReport.getArtifact());
-                            }
-                        }
-
-                    }
+                        return artifactReports;
+                    }).forEachOrdered((artifactReports) -> {
+                        artifactReports.stream().filter((artifactReport) -> (artifactReport.getDownloadStatus() != DownloadStatus.FAILED)).forEachOrdered((artifactReport) -> {
+                            artifacts.add(artifactReport.getArtifact());
+                        });
+                    });
                 }
             }
 

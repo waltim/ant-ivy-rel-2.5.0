@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.java.j2seproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
+            <name>ant-ivy-rel-2.5.0</name>
+            <source-roots>
+                <root id="src.dir"/>
+                <root id="src2.dir"/>
+                <root id="java.dir"/>
+                <root id="src3.dir"/>
+                <root id="src4.dir"/>
+                <root id="src5.dir"/>
+                <root id="src6.dir"/>
+                <root id="src7.dir"/>
+                <root id="src8.dir"/>
+                <root id="src9.dir"/>
+                <root id="src10.dir"/>
+                <root id="src11.dir"/>
+                <root id="src12.dir"/>
+                <root id="src13.dir"/>
+                <root id="src14.dir"/>
+            </source-roots>
+            <test-roots>
+                <root id="test.src.dir"/>
+                <root id="test.custom-classpath.dir"/>
+                <root id="test.java.dir"/>
+            </test-roots>
+        </data>
+        <libraries xmlns="http://www.netbeans.org/ns/ant-project-libraries/1">
+            <definitions>./lib/nblibraries.properties</definitions>
+        </libraries>
+    </configuration>
+</project>

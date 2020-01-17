@@ -36,11 +36,7 @@ public final class FindFile {
   }
 
   private static Collection<File> find(Collection<File> files, final String name) {
-    return CollectionUtils.select(files, new Predicate<File>() {
-      public boolean evaluate(File file) {
-        return file.getName().contains(name);
-      }
-    });
+    return CollectionUtils.select(files, (File file) -> file.getName().contains(name));
   }
 
   private FindFile() {

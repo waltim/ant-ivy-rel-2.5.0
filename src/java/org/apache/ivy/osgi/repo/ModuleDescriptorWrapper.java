@@ -72,9 +72,9 @@ public class ModuleDescriptorWrapper {
             return Collections.emptyList();
         }
         List<ModuleDescriptor> unwrapped = new ArrayList<>();
-        for (ModuleDescriptorWrapper wrapped : collection) {
+        collection.forEach((wrapped) -> {
             unwrapped.add(wrapped.getModuleDescriptor());
-        }
+        });
         return unwrapped;
     }
 

@@ -121,7 +121,7 @@ public class IvyDependencyUpdateChecker extends IvyPostResolveTask {
     private void displayMissingDependencyOnLatest(ResolveReport originalReport,
             ResolveReport latestReport) {
         List<ModuleRevisionId> listOfMissingDependencyOnLatest = new ArrayList<>();
-        for (IvyNode originalDependency : originalReport.getDependencies()) {
+        originalReport.getDependencies().forEach((originalDependency) -> {
             boolean dependencyFound = false;
             for (IvyNode latest : latestReport.getDependencies()) {
                 if (originalDependency.getModuleId().equals(latest.getModuleId())) {
@@ -131,20 +131,20 @@ public class IvyDependencyUpdateChecker extends IvyPostResolveTask {
             if (!dependencyFound) {
                 listOfMissingDependencyOnLatest.add(originalDependency.getId());
             }
-        }
+        });
 
         if (listOfMissingDependencyOnLatest.size() > 0) {
             log("List of missing dependency on latest resolve :");
-            for (ModuleRevisionId moduleRevisionId : listOfMissingDependencyOnLatest) {
+            listOfMissingDependencyOnLatest.forEach((moduleRevisionId) -> {
                 log("\t" + moduleRevisionId.toString());
-            }
+            });
         }
     }
 
     private void displayNewDependencyOnLatest(ResolveReport originalReport,
             ResolveReport latestReport) {
         List<ModuleRevisionId> listOfNewDependencyOnLatest = new ArrayList<>();
-        for (IvyNode latest : latestReport.getDependencies()) {
+        latestReport.getDependencies().forEach((latest) -> {
             boolean dependencyFound = false;
             for (IvyNode originalDependency : originalReport.getDependencies()) {
                 if (originalDependency.getModuleId().equals(latest.getModuleId())) {
@@ -154,12 +154,12 @@ public class IvyDependencyUpdateChecker extends IvyPostResolveTask {
             if (!dependencyFound) {
                 listOfNewDependencyOnLatest.add(latest.getId());
             }
-        }
+        });
         if (listOfNewDependencyOnLatest.size() > 0) {
             log("List of new dependency on latest resolve :");
-            for (ModuleRevisionId moduleRevisionId : listOfNewDependencyOnLatest) {
+            listOfNewDependencyOnLatest.forEach((moduleRevisionId) -> {
                 log("\t" + moduleRevisionId.toString());
-            }
+            });
         }
     }
 

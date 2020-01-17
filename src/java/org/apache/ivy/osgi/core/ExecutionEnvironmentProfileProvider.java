@@ -74,15 +74,9 @@ public class ExecutionEnvironmentProfileProvider {
             defaultProfilesFile.close();
         }
         Map<String, ExecutionEnvironmentProfile> profiles = new HashMap<>();
-        for (Map.Entry<Object, Object> prop : props.entrySet()) {
-            String propName = (String) prop.getKey();
-            if (propName.endsWith(".pkglist")) {
-                String profileName = propName.substring(0, propName.length() - 8);
-                if (!profiles.containsKey(profileName)) {
-                    loadProfile(props, profiles, profileName);
-                }
-            }
-        }
+        props.entrySet().stream().map((prop) -> (String) prop.getKey()).filter((propName) -> (propName.endsWith(".pkglist"))).map((propName) -> propName.substring(0, propName.length() - 8)).filter((profileName) -> (!profiles.containsKey(profileName))).forEachOrdered((profileName) -> {
+            loadProfile(props, profiles, profileName);
+        });
         return profiles;
     }
 

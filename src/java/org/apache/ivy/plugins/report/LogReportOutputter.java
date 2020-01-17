@@ -54,10 +54,7 @@ public class LogReportOutputter implements ReportOutputter {
             Collections.sort(dependencies);
             if (dependencies.size() > 0) {
                 String[] confs = report.getConfigurations();
-                for (IvyNode node : dependencies) {
-                    if (node.isCompletelyEvicted() || node.hasProblem()) {
-                        continue;
-                    }
+                dependencies.stream().filter((node) -> !(node.isCompletelyEvicted() || node.hasProblem())).forEachOrdered((node) -> {
                     List<String> nodeConfs = new ArrayList<>(confs.length);
                     for (String conf : confs) {
                         if (report.getConfigurationReport(conf).getModuleRevisionIds()
@@ -67,7 +64,7 @@ public class LogReportOutputter implements ReportOutputter {
                     }
                     Message.info("\t" + node + " from "
                             + node.getModuleRevision().getResolver().getName() + " in " + nodeConfs);
-                }
+                });
             }
         }
 

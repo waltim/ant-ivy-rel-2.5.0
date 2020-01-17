@@ -366,24 +366,20 @@ public abstract class BasicResolver extends AbstractResolver {
                         ModuleRevisionId.newInstance(systemMrid, systemMd.getRevision()),
                 ivyRef.getResource());
 
-        cacheManager.originalToCachedModuleDescriptor(this, ivyRef, requestedMetadataArtifact, rmr,
-            new ModuleDescriptorWriter() {
-                public void write(ResolvedResource originalMdResource, ModuleDescriptor md,
-                        File src, File dest) throws IOException, ParseException {
-                    if (originalMdResource == null) {
-                        // a basic ivy file is written containing default data
-                        XmlModuleDescriptorWriter.write(md, dest);
-                    } else {
-                        // copy and update ivy file from source to cache
-                        parser.toIvyFile(new FileInputStream(src),
-                            originalMdResource.getResource(), dest, md);
-                        long repLastModified = originalMdResource.getLastModified();
-                        if (repLastModified > 0) {
-                            dest.setLastModified(repLastModified);
-                        }
-                    }
+        cacheManager.originalToCachedModuleDescriptor(this, ivyRef, requestedMetadataArtifact, rmr, (ResolvedResource originalMdResource, ModuleDescriptor md, File src, File dest) -> {
+            if (originalMdResource == null) {
+                // a basic ivy file is written containing default data
+                XmlModuleDescriptorWriter.write(md, dest);
+            } else {
+                // copy and update ivy file from source to cache
+                parser.toIvyFile(new FileInputStream(src),
+                        originalMdResource.getResource(), dest, md);
+                long repLastModified = originalMdResource.getLastModified();
+                if (repLastModified > 0) {
+                    dest.setLastModified(repLastModified);
                 }
-            });
+            }
+        });
     }
 
     private void checkNotConvertedExclusionRule(ModuleDescriptor systemMd, ResolvedResource ivyRef,
@@ -543,35 +539,30 @@ public abstract class BasicResolver extends AbstractResolver {
     }
 
     protected ResourceMDParser getRMDParser(final DependencyDescriptor dd, final ResolveData data) {
-        return new ResourceMDParser() {
-            public MDResolvedResource parse(Resource resource, String rev) {
-                try {
-                    ResolvedModuleRevision rmr = BasicResolver.this.parse(new ResolvedResource(
-                            resource, rev), dd, data);
-                    if (rmr != null) {
-                        return new MDResolvedResource(resource, rev, rmr);
-                    }
-                } catch (ParseException e) {
-                    Message.warn("Failed to parse the file '" + resource + "'", e);
+        return (Resource resource, String rev) -> {
+            try {
+                ResolvedModuleRevision rmr = BasicResolver.this.parse(new ResolvedResource(
+                        resource, rev), dd, data);
+                if (rmr != null) {
+                    return new MDResolvedResource(resource, rev, rmr);
                 }
-                return null;
+            } catch (ParseException e) {
+                Message.warn("Failed to parse the file '" + resource + "'", e);
             }
-
+            return null;
         };
     }
 
     protected ResourceMDParser getDefaultRMDParser(final ModuleId mid) {
-        return new ResourceMDParser() {
-            public MDResolvedResource parse(Resource resource, String rev) {
-                DefaultModuleDescriptor md = DefaultModuleDescriptor
-                        .newDefaultInstance(new ModuleRevisionId(mid, rev));
-                MetadataArtifactDownloadReport madr = new MetadataArtifactDownloadReport(
-                        md.getMetadataArtifact());
-                madr.setDownloadStatus(DownloadStatus.NO);
-                madr.setSearched(true);
-                return new MDResolvedResource(resource, rev, new ResolvedModuleRevision(
-                        BasicResolver.this, BasicResolver.this, md, madr, isForce()));
-            }
+        return (Resource resource, String rev) -> {
+            DefaultModuleDescriptor md = DefaultModuleDescriptor
+                    .newDefaultInstance(new ModuleRevisionId(mid, rev));
+            MetadataArtifactDownloadReport madr = new MetadataArtifactDownloadReport(
+                    md.getMetadataArtifact());
+            madr.setDownloadStatus(DownloadStatus.NO);
+            madr.setSearched(true);
+            return new MDResolvedResource(resource, rev, new ResolvedModuleRevision(
+                    BasicResolver.this, BasicResolver.this, md, madr, isForce()));
         };
     }
 
@@ -798,18 +789,18 @@ public abstract class BasicResolver extends AbstractResolver {
     @Override
     public void reportFailure() {
         Message.warn("==== " + getName() + ": tried");
-        for (String m : ivyattempts) {
+        ivyattempts.forEach((m) -> {
             Message.warn("  " + m);
-        }
-        for (Map.Entry<Artifact, List<String>> entry : artattempts.entrySet()) {
+        });
+        artattempts.entrySet().forEach((entry) -> {
             List<String> attempts = entry.getValue();
             if (attempts != null) {
                 Message.warn("  -- artifact " + entry.getKey() + ":");
-                for (String m : attempts) {
+                attempts.forEach((m) -> {
                     Message.warn("  " + m);
-                }
+                });
             }
-        }
+        });
     }
 
     @Override
@@ -817,9 +808,9 @@ public abstract class BasicResolver extends AbstractResolver {
         Message.warn("==== " + getName() + ": tried");
         List<String> attempts = artattempts.get(art);
         if (attempts != null) {
-            for (String m : attempts) {
+            attempts.forEach((m) -> {
                 Message.warn("  " + m);
-            }
+            });
         }
     }
 
@@ -859,21 +850,18 @@ public abstract class BasicResolver extends AbstractResolver {
     @Override
     public ArtifactDownloadReport download(final ArtifactOrigin origin, DownloadOptions options) {
         Checks.checkNotNull(origin, "origin");
-        return getRepositoryCacheManager().download(origin.getArtifact(),
-            new ArtifactResourceResolver() {
-                public ResolvedResource resolve(Artifact artifact) {
-                    try {
-                        Resource resource = getResource(origin.getLocation());
-                        if (resource != null) {
-                            String revision = origin.getArtifact().getModuleRevisionId().getRevision();
-                            return new ResolvedResource(resource, revision);
-                        }
-                    } catch (IOException e) {
-                        Message.debug(e);
-                    }
-                    return null;
+        return getRepositoryCacheManager().download(origin.getArtifact(), (Artifact artifact) -> {
+            try {
+                Resource resource = getResource(origin.getLocation());
+                if (resource != null) {
+                    String revision = origin.getArtifact().getModuleRevisionId().getRevision();
+                    return new ResolvedResource(resource, revision);
                 }
-            }, downloader, getCacheDownloadOptions(options));
+            } catch (IOException e) {
+                Message.debug(e);
+            }
+            return null;
+        }, downloader, getCacheDownloadOptions(options));
     }
 
     protected abstract Resource getResource(String source) throws IOException;
@@ -926,9 +914,9 @@ public abstract class BasicResolver extends AbstractResolver {
         Collection<String> names = findNames(Collections.<String, String> emptyMap(),
             IvyPatternHelper.ORGANISATION_KEY);
         List<OrganisationEntry> ret = new ArrayList<>(names.size());
-        for (String org : names) {
+        names.forEach((org) -> {
             ret.add(new OrganisationEntry(this, org));
-        }
+        });
         return ret.toArray(new OrganisationEntry[names.size()]);
     }
 
@@ -938,9 +926,9 @@ public abstract class BasicResolver extends AbstractResolver {
         tokenValues.put(IvyPatternHelper.ORGANISATION_KEY, org.getOrganisation());
         Collection<String> names = findNames(tokenValues, IvyPatternHelper.MODULE_KEY);
         List<ModuleEntry> ret = new ArrayList<>(names.size());
-        for (String name : names) {
+        names.forEach((name) -> {
             ret.add(new ModuleEntry(org, name));
-        }
+        });
         return ret.toArray(new ModuleEntry[names.size()]);
     }
 
@@ -951,9 +939,9 @@ public abstract class BasicResolver extends AbstractResolver {
         tokenValues.put(IvyPatternHelper.MODULE_KEY, mod.getModule());
         Collection<String> names = findNames(tokenValues, IvyPatternHelper.REVISION_KEY);
         List<RevisionEntry> ret = new ArrayList<>(names.size());
-        for (String name : names) {
+        names.forEach((name) -> {
             ret.add(new RevisionEntry(mod, name));
-        }
+        });
         return ret.toArray(new RevisionEntry[names.size()]);
     }
 
@@ -1128,11 +1116,9 @@ public abstract class BasicResolver extends AbstractResolver {
         this.checksums = checksums;
     }
 
-    private final ArtifactResourceResolver artifactResourceResolver = new ArtifactResourceResolver() {
-        public ResolvedResource resolve(Artifact artifact) {
-            artifact = fromSystem(artifact);
-            return getArtifactRef(artifact, null);
-        }
+    private final ArtifactResourceResolver artifactResourceResolver = (Artifact artifact) -> {
+        artifact = fromSystem(artifact);
+        return getArtifactRef(artifact, null);
     };
 
     private final ResourceDownloader downloader = new ResourceDownloader() {

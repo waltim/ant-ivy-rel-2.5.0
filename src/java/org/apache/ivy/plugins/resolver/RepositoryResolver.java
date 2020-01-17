@@ -313,15 +313,11 @@ public class RepositoryResolver extends AbstractPatternsBasedResolver {
     @Override
     protected void findTokenValues(Collection<String> names, List<String> patterns,
             Map<String, String> tokenValues, String token) {
-        for (String pattern : patterns) {
-            String partiallyResolvedPattern = IvyPatternHelper.substituteTokens(pattern,
-                tokenValues);
-            String[] values = ResolverHelper.listTokenValues(repository, partiallyResolvedPattern,
-                token);
-            if (values != null) {
-                names.addAll(filterNames(new ArrayList<>(Arrays.asList(values))));
-            }
-        }
+        patterns.stream().map((pattern) -> IvyPatternHelper.substituteTokens(pattern,
+                tokenValues)).map((partiallyResolvedPattern) -> ResolverHelper.listTokenValues(repository, partiallyResolvedPattern,
+                        token)).filter((values) -> (values != null)).forEachOrdered((values) -> {
+                            names.addAll(filterNames(new ArrayList<>(Arrays.asList(values))));
+        });
     }
 
     @Override

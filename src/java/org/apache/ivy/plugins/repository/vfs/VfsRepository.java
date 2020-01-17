@@ -178,10 +178,12 @@ public class VfsRepository extends AbstractRepository {
         Message.debug("FileType.FOLDER" + FileType.FOLDER);
         if (resourceImpl.exists() && resourceImpl.getType() == FileType.FOLDER) {
             List<FileObject> children = Arrays.asList(resourceImpl.getChildren());
-            for (FileObject child : children) {
+            children.stream().map((child) -> {
                 Message.debug("child " + children.indexOf(child) + child.getName().getURI());
+                return child;
+            }).forEachOrdered((child) -> {
                 list.add(VfsResource.normalize(child.getName().getURI()));
-            }
+            });
         }
         return list;
     }

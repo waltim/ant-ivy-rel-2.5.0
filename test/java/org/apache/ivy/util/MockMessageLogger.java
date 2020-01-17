@@ -81,12 +81,10 @@ public class MockMessageLogger extends AbstractMessageLogger {
     }
 
     public void assertLogDoesntContain(String message) {
-        for (String log : logs) {
-            if (log.contains(message)) {
-                throw new AssertionError("logs contain unexpected message: '" + message
-                        + "' logs='\n" + join(logs) + "'");
-            }
-        }
+        logs.stream().filter((log) -> (log.contains(message))).forEachOrdered((_item) -> {
+            throw new AssertionError("logs contain unexpected message: '" + message
+                    + "' logs='\n" + join(logs) + "'");
+        });
     }
 
     public void assertLogVerboseContains(String message) {
@@ -109,9 +107,9 @@ public class MockMessageLogger extends AbstractMessageLogger {
 
     private String join(List<String> logs) {
         StringBuilder sb = new StringBuilder();
-        for (String log : logs) {
+        logs.forEach((log) -> {
             sb.append(log).append("\n");
-        }
+        });
         return sb.toString();
     }
 

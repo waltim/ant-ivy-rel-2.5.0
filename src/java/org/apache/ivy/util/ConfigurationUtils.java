@@ -85,9 +85,9 @@ public final class ConfigurationUtils {
                 result.add(conf);
             }
         }
-        for (String ex : excluded) {
+        excluded.forEach((ex) -> {
             result.remove(ex);
-        }
+        });
 
         return result.toArray(new String[result.size()]);
     }

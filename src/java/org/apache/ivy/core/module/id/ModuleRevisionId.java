@@ -263,12 +263,12 @@ public class ModuleRevisionId extends UnmodifiableExtendableItem {
         attributes.keySet().removeAll(getExtraAttributes().keySet());
         attributes.putAll(getQualifiedExtraAttributes());
 
-        for (Map.Entry<String, String> att : attributes.entrySet()) {
+        attributes.entrySet().forEach((att) -> {
             String value = att.getValue();
             value = (value == null) ? NULL_ENCODE : value;
             buf.append(ENCODE_PREFIX).append(att.getKey()).append(ENCODE_SEPARATOR)
                     .append(ENCODE_PREFIX).append(value).append(ENCODE_SEPARATOR);
-        }
+        });
         return buf.toString();
     }
 

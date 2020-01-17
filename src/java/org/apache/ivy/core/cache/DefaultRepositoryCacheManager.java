@@ -150,10 +150,10 @@ public class DefaultRepositoryCacheManager implements RepositoryCacheManager, Iv
         packagingManager.setSettings(settings);
         // process and setup the configured TTLs (which weren't yet processed since they needed
         // a settings instance to be present)
-        for (final ConfiguredTTL configuredTTL : configuredTTLs) {
+        configuredTTLs.forEach((configuredTTL) -> {
             this.addTTL(configuredTTL.attributes,
                     configuredTTL.matcher == null ? ExactPatternMatcher.INSTANCE : settings.getMatcher(configuredTTL.matcher), configuredTTL.duration);
-        }
+        });
         // clear off the configured TTLs since we have now processed them and created TTL rules
         // out of them
         this.configuredTTLs.clear();
@@ -1337,11 +1337,7 @@ public class DefaultRepositoryCacheManager implements RepositoryCacheManager, Iv
 
             Artifact originalMetadataArtifact = getOriginalMetadataArtifact(moduleArtifact);
             // now download module descriptor and parse it
-            report = download(originalMetadataArtifact, new ArtifactResourceResolver() {
-                public ResolvedResource resolve(Artifact artifact) {
-                    return mdRef;
-                }
-            }, backupDownloader, new CacheDownloadOptions().setListener(options.getListener())
+            report = download(originalMetadataArtifact, (Artifact artifact) -> mdRef, backupDownloader, new CacheDownloadOptions().setListener(options.getListener())
                     .setForce(true));
             Message.verbose("\t" + report);
 
@@ -1594,9 +1590,9 @@ public class DefaultRepositoryCacheManager implements RepositoryCacheManager, Iv
                 this.attributes = Collections.emptyMap();
             } else {
                 final Map<String, String> attrs = new HashMap<>(attributes);
-                for (final String removable : attributesNotContributingToMatching) {
+                attributesNotContributingToMatching.forEach((removable) -> {
                     attrs.remove(removable);
-                }
+                });
                 this.attributes = Collections.unmodifiableMap(attrs);
             }
         }

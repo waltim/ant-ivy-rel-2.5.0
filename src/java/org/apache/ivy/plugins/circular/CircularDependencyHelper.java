@@ -67,9 +67,9 @@ public final class CircularDependencyHelper {
      */
     public static String formatMessageFromDescriptors(List<ModuleDescriptor> loopElements) {
         List<ModuleRevisionId> mrids = new LinkedList<>();
-        for (ModuleDescriptor descriptor : loopElements) {
+        loopElements.forEach((descriptor) -> {
             mrids.add(descriptor.getModuleRevisionId());
-        }
+        });
         return formatMessage(mrids.toArray(new ModuleRevisionId[mrids.size()]));
     }
 

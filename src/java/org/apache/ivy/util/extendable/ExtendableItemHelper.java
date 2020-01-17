@@ -146,9 +146,9 @@ public final class ExtendableItemHelper {
     public static void fillExtraAttributes(ParserSettings settings, DefaultExtendableItem item,
             Attributes attributes, List<String> ignoredAttNames) {
         Map<String, String> att = getExtraAttributes(settings, attributes, ignoredAttNames);
-        for (Map.Entry<String, String> entry : att.entrySet()) {
+        att.entrySet().forEach((entry) -> {
             item.setExtraAttribute(entry.getKey(), entry.getValue());
-        }
+        });
     }
 
 }

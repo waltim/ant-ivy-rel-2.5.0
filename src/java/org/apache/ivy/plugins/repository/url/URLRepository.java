@@ -101,9 +101,9 @@ public class URLRepository extends AbstractRepository {
             List<URL> urls = lister.listAll(new URL(parent));
             if (urls != null) {
                 List<String> ret = new ArrayList<>(urls.size());
-                for (URL url : urls) {
+                urls.forEach((url) -> {
                     ret.add(url.toExternalForm());
-                }
+                });
                 return ret;
             }
         } else if (parent.startsWith("file")) {

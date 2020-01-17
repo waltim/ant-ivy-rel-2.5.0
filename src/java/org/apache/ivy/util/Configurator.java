@@ -201,7 +201,7 @@ public class Configurator {
 
         public Object play(Configurator conf, Map<String, String> attValues,
                            Map<String, List<MacroRecord>> macroRecords) {
-            for (Attribute att : attributes.values()) {
+            attributes.values().forEach((att) -> {
                 String val = attValues.get(att.getName());
                 if (val == null) {
                     if (att.getDefault() == null) {
@@ -211,7 +211,7 @@ public class Configurator {
                         attValues.put(att.getName(), att.getDefault());
                     }
                 }
-            }
+            });
             return play(conf, macroRecord, attValues, macroRecords);
         }
 
@@ -224,19 +224,19 @@ public class Configurator {
                 return macroRecord.getObject();
             }
             conf.startCreateChild(macroRecord.getName());
-            for (Map.Entry<String, String> attribute : macroRecord.getAttributes().entrySet()) {
+            macroRecord.getAttributes().entrySet().forEach((attribute) -> {
                 conf.setAttribute(attribute.getKey(), replaceParam(attribute.getValue(), attValues));
-            }
+            });
             for (MacroRecord child : macroRecord.getChildren()) {
                 Element elt = elements.get(child.getName());
                 if (elt != null) {
                     List<MacroRecord> elements = childrenRecords.get(child.getName());
                     if (elements != null) {
-                        for (MacroRecord element : elements) {
-                            for (MacroRecord r : element.getChildren()) {
+                        elements.forEach((element) -> {
+                            element.getChildren().forEach((r) -> {
                                 play(conf, r, attValues, Collections.<String, List<MacroRecord>>emptyMap());
-                            }
-                        }
+                            });
+                        });
                     } else if (!elt.isOptional()) {
                         throw new IllegalArgumentException(
                                 "non optional element is not specified: " + elt.getName()

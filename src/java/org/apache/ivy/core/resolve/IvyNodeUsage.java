@@ -173,9 +173,9 @@ public class IvyNodeUsage {
     }
 
     public void updateDataFrom(Collection<IvyNodeUsage> usages, String rootModuleConf) {
-        for (IvyNodeUsage usage : usages) {
+        usages.forEach((usage) -> {
             updateDataFrom(usage, rootModuleConf);
-        }
+        });
     }
 
     private void updateDataFrom(IvyNodeUsage usage, String rootModuleConf) {
@@ -190,9 +190,9 @@ public class IvyNodeUsage {
     }
 
     private <K, V> void updateMapOfSet(Map<K, Set<V>> from, Map<K, Set<V>> to) {
-        for (K key : from.keySet()) {
+        from.keySet().forEach((key) -> {
             updateMapOfSetForKey(from, to, key);
-        }
+        });
     }
 
     private <K, V> void updateMapOfSetForKey(Map<K, Set<V>> from, Map<K, Set<V>> to, K key) {
@@ -230,11 +230,10 @@ public class IvyNodeUsage {
             return null;
         }
         Set<DependencyArtifactDescriptor> dependencyArtifacts = new HashSet<>();
-        for (Depender depender : dependersInConf) {
-            DependencyArtifactDescriptor[] dads = depender.dd
-                    .getDependencyArtifacts(depender.dependerConf);
-            dependencyArtifacts.addAll(Arrays.asList(dads));
-        }
+        dependersInConf.stream().map((depender) -> depender.dd
+                .getDependencyArtifacts(depender.dependerConf)).forEachOrdered((dads) -> {
+                    dependencyArtifacts.addAll(Arrays.asList(dads));
+        });
         return dependencyArtifacts;
     }
 
@@ -330,10 +329,8 @@ public class IvyNodeUsage {
         if (dependersSet == null) {
             return false;
         }
-        for (Depender depender : dependersSet) {
-            if (depender.dd.isTransitive()) {
-                return true;
-            }
+        if (dependersSet.stream().anyMatch((depender) -> (depender.dd.isTransitive()))) {
+            return true;
         }
         return false;
     }

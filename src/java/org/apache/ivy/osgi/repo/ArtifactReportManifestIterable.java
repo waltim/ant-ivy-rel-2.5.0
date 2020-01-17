@@ -44,7 +44,7 @@ public class ArtifactReportManifestIterable implements Iterable<ManifestAndLocat
     public ArtifactReportManifestIterable(List<ArtifactDownloadReport> reports,
             List<String> sourceTypes) {
         this.sourceTypes = sourceTypes;
-        for (ArtifactDownloadReport report : reports) {
+        reports.forEach((report) -> {
             ModuleRevisionId mrid = report.getArtifact().getModuleRevisionId();
             List<ArtifactDownloadReport> moduleReports = artifactReports.get(mrid);
             if (moduleReports == null) {
@@ -52,7 +52,7 @@ public class ArtifactReportManifestIterable implements Iterable<ManifestAndLocat
                 artifactReports.put(mrid, moduleReports);
             }
             moduleReports.add(report);
-        }
+        });
     }
 
     public Iterator<ManifestAndLocation> iterator() {

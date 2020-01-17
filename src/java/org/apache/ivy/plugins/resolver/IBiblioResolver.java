@@ -440,7 +440,7 @@ public class IBiblioResolver extends URLResolver {
             if (revs != null) {
                 Message.debug("\tfound revs: " + revs);
                 List<ResolvedResource> rres = new ArrayList<>();
-                for (String rev : revs) {
+                revs.forEach((rev) -> {
                     ModuleRevisionId historicalMrid = ModuleRevisionId.newInstance(mrid, rev);
 
                     String patternForRev = pattern;
@@ -466,7 +466,7 @@ public class IBiblioResolver extends URLResolver {
                                 "impossible to get resource from name listed by maven-metadata.xml:"
                                         + rres, e);
                     }
-                }
+                });
                 return rres.toArray(new ResolvedResource[rres.size()]);
             } else {
                 // maven metadata not available or something went wrong,

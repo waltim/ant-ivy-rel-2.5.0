@@ -186,10 +186,10 @@ public class RetrieveEngine {
                     } else {
                         Collection<File> files = FileUtil.listAll(destFile,
                             Collections.<String> emptyList());
-                        for (File file : files) {
+                        files.forEach((file) -> {
                             targetArtifactsStructure.addAll(FileUtil.getPathFiles(fileRetrieveRoot,
-                                file));
-                        }
+                                    file));
+                        });
                     }
                 }
             }
@@ -263,18 +263,18 @@ public class RetrieveEngine {
 
     private void sync(Collection<File> target, Collection<File> existing) {
         Collection<File> toRemove = new HashSet<>();
-        for (File file : existing) {
+        existing.forEach((file) -> {
             toRemove.add(file.getAbsoluteFile());
-        }
-        for (File file : target) {
+        });
+        target.forEach((file) -> {
             toRemove.remove(file.getAbsoluteFile());
-        }
-        for (File file : toRemove) {
-            if (file.exists()) {
-                Message.verbose("\t\tdeleting " + file);
-                FileUtil.forceDelete(file);
-            }
-        }
+        });
+        toRemove.stream().filter((file) -> (file.exists())).map((file) -> {
+            Message.verbose("\t\tdeleting " + file);
+            return file;
+        }).forEachOrdered((file) -> {
+            FileUtil.forceDelete(file);
+        });
     }
 
     public Map<ArtifactDownloadReport, Set<String>> determineArtifactsToCopy(ModuleRevisionId mrid,
@@ -317,8 +317,7 @@ public class RetrieveEngine {
             final PackagingManager packagingManager = new PackagingManager();
             packagingManager.setSettings(IvyContext.getContext().getSettings());
 
-            for (final ArtifactDownloadReport adr : artifacts) {
-
+            artifacts.forEach((adr) -> {
                 final Artifact artifact = adr.getArtifact();
                 final String ext;
                 if (adr.getUnpackedLocalFile() == null) {
@@ -338,61 +337,58 @@ public class RetrieveEngine {
                     }
                     ext = unpackedArtifact.getExt();
                 }
-
+                // skip this artifact, the filter didn't accept it!
                 String destPattern = "ivy".equals(adr.getType()) ? destIvyPattern : destFilePattern;
-
-                if (!"ivy".equals(adr.getType())
-                        && !options.getArtifactFilter().accept(adr.getArtifact())) {
-                    continue; // skip this artifact, the filter didn't accept it!
-                }
-
-                ModuleRevisionId aMrid = artifact.getModuleRevisionId();
-                String destFileName = IvyPatternHelper.substitute(destPattern,
-                    aMrid.getOrganisation(), aMrid.getName(), aMrid.getBranch(),
-                    aMrid.getRevision(), artifact.getName(), artifact.getType(), ext, conf,
-                    adr.getArtifactOrigin(), aMrid.getQualifiedExtraAttributes(),
-                    artifact.getQualifiedExtraAttributes());
-                Set<String> dest = artifactsToCopy.get(adr);
-                if (dest == null) {
-                    dest = new HashSet<>();
-                    artifactsToCopy.put(adr, dest);
-                }
-                String copyDest = settings.resolveFile(destFileName).getAbsolutePath();
-
-                String[] destinations = new String[] {copyDest};
-                if (options.getMapper() != null) {
-                    destinations = options.getMapper().mapFileName(copyDest);
-                }
-
-                for (String destination : destinations) {
-                    dest.add(destination);
-
-                    Set<ArtifactRevisionId> conflicts = conflictsMap.get(destination);
-                    Set<ArtifactDownloadReport> conflictsReports = conflictsReportsMap
-                            .get(destination);
-                    Set<String> conflictsConf = conflictsConfMap.get(destination);
-                    if (conflicts == null) {
-                        conflicts = new HashSet<>();
-                        conflictsMap.put(destination, conflicts);
+                if (!(!"ivy".equals(adr.getType())
+                        && !options.getArtifactFilter().accept(adr.getArtifact()))) {
+                    ModuleRevisionId aMrid = artifact.getModuleRevisionId();
+                    String destFileName = IvyPatternHelper.substitute(destPattern,
+                            aMrid.getOrganisation(), aMrid.getName(), aMrid.getBranch(),
+                            aMrid.getRevision(), artifact.getName(), artifact.getType(), ext, conf,
+                            adr.getArtifactOrigin(), aMrid.getQualifiedExtraAttributes(),
+                            artifact.getQualifiedExtraAttributes());
+                    Set<String> dest = artifactsToCopy.get(adr);
+                    if (dest == null) {
+                        dest = new HashSet<>();
+                        artifactsToCopy.put(adr, dest);
                     }
-                    if (conflictsReports == null) {
-                        conflictsReports = new HashSet<>();
-                        conflictsReportsMap.put(destination, conflictsReports);
+                    String copyDest = settings.resolveFile(destFileName).getAbsolutePath();
+                    
+                    String[] destinations = new String[] {copyDest};
+                    if (options.getMapper() != null) {
+                        destinations = options.getMapper().mapFileName(copyDest);
                     }
-                    if (conflictsConf == null) {
-                        conflictsConf = new HashSet<>();
-                        conflictsConfMap.put(destination, conflictsConf);
-                    }
-                    if (conflicts.add(artifact.getId())) {
-                        conflictsReports.add(adr);
-                        conflictsConf.add(conf);
+                    
+                    for (String destination : destinations) {
+                        dest.add(destination);
+                        
+                        Set<ArtifactRevisionId> conflicts = conflictsMap.get(destination);
+                        Set<ArtifactDownloadReport> conflictsReports = conflictsReportsMap
+                                .get(destination);
+                        Set<String> conflictsConf = conflictsConfMap.get(destination);
+                        if (conflicts == null) {
+                            conflicts = new HashSet<>();
+                            conflictsMap.put(destination, conflicts);
+                        }
+                        if (conflictsReports == null) {
+                            conflictsReports = new HashSet<>();
+                            conflictsReportsMap.put(destination, conflictsReports);
+                        }
+                        if (conflictsConf == null) {
+                            conflictsConf = new HashSet<>();
+                            conflictsConfMap.put(destination, conflictsConf);
+                        }
+                        if (conflicts.add(artifact.getId())) {
+                            conflictsReports.add(adr);
+                            conflictsConf.add(conf);
+                        }
                     }
                 }
-            }
+            });
         }
 
         // resolve conflicts if any
-        for (Map.Entry<String, Set<ArtifactRevisionId>> entry : conflictsMap.entrySet()) {
+        conflictsMap.entrySet().forEach((entry) -> {
             String copyDest = entry.getKey();
             Set<ArtifactRevisionId> artifacts = entry.getValue();
             Set<String> conflictsConfs = conflictsConfMap.get(copyDest);
@@ -412,7 +408,7 @@ public class RetrieveEngine {
                     if (winnerMD.equals(current.getArtifact().getModuleRevisionId())) {
                         throw new RuntimeException("Multiple artifacts of the module " + winnerMD
                                 + " are retrieved to the same file! Update the retrieve pattern "
-                                + " to fix this error.");
+                                        + " to fix this error.");
                     }
                 }
 
@@ -434,7 +430,7 @@ public class RetrieveEngine {
                     }
                 }
             }
-        }
+        });
         return artifactsToCopy;
     }
 
@@ -471,22 +467,20 @@ public class RetrieveEngine {
      * @return Comparator&lt;ArtifactDownloadReport&gt;
      */
     private Comparator<ArtifactDownloadReport> getConflictResolvingPolicy() {
-        return new Comparator<ArtifactDownloadReport>() {
-            // younger conflict resolving policy
-            public int compare(ArtifactDownloadReport o1, ArtifactDownloadReport o2) {
-                Artifact a1 = o1.getArtifact();
-                Artifact a2 = o2.getArtifact();
-                if (a1.getPublicationDate().after(a2.getPublicationDate())) {
-                    // a1 is after a2 <=> a1 is younger than a2 <=> a1 wins the conflict battle
-                    return +1;
-                } else if (a1.getPublicationDate().before(a2.getPublicationDate())) {
-                    // a1 is before a2 <=> a2 is younger than a1 <=> a2 wins the conflict battle
-                    return -1;
-                } else {
-                    return 0;
-                }
+        return (ArtifactDownloadReport o1, ArtifactDownloadReport o2) -> {
+            Artifact a1 = o1.getArtifact();
+            Artifact a2 = o2.getArtifact();
+            if (a1.getPublicationDate().after(a2.getPublicationDate())) {
+                // a1 is after a2 <=> a1 is younger than a2 <=> a1 wins the conflict battle
+                return +1;
+            } else if (a1.getPublicationDate().before(a2.getPublicationDate())) {
+                // a1 is before a2 <=> a2 is younger than a1 <=> a2 wins the conflict battle
+                return -1;
+            } else {
+                return 0;
             }
-        };
+        } // younger conflict resolving policy
+        ;
     }
 
 }

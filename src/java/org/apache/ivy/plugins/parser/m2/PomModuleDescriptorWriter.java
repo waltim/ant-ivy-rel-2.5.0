@@ -222,7 +222,7 @@ public final class PomModuleDescriptorWriter {
             }
 
             // print the extra dependencies first
-            for (ExtraDependency dep : extraDeps) {
+            extraDeps.forEach((dep) -> {
                 String groupId = dep.getGroup();
                 if (groupId == null) {
                     groupId = md.getModuleRevisionId().getOrganisation();
@@ -232,8 +232,8 @@ public final class PomModuleDescriptorWriter {
                     version = md.getModuleRevisionId().getRevision();
                 }
                 printDependency(out, indent, groupId, dep.getArtifact(), version, dep.getType(),
-                    dep.getClassifier(), dep.getScope(), dep.isOptional(), true, null);
-            }
+                        dep.getClassifier(), dep.getScope(), dep.isOptional(), true, null);
+            });
 
             // now print the dependencies listed in the ModuleDescriptor
             ConfigurationScopeMapping mapping = options.getMapping();

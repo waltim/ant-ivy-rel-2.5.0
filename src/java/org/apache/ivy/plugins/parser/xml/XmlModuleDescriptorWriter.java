@@ -76,10 +76,10 @@ public final class XmlModuleDescriptorWriter {
             }
             StringBuilder xmlNamespace = new StringBuilder();
             Map<String, String> namespaces = md.getExtraAttributesNamespaces();
-            for (Map.Entry<String, String> ns : namespaces.entrySet()) {
+            namespaces.entrySet().forEach((ns) -> {
                 xmlNamespace.append(" xmlns:").append(ns.getKey()).append("=\"")
                         .append(ns.getValue()).append("\"");
-            }
+            });
 
             String version = "2.0";
             if (md.getInheritedDescriptors().length > 0) {
@@ -180,7 +180,7 @@ public final class XmlModuleDescriptorWriter {
         Map<MapMatcher, DependencyDescriptorMediator> mediators = md
                 .getAllDependencyDescriptorMediators().getAllRules();
 
-        for (Map.Entry<MapMatcher, DependencyDescriptorMediator> mediatorRule : mediators.entrySet()) {
+        mediators.entrySet().forEach((mediatorRule) -> {
             MapMatcher matcher = mediatorRule.getKey();
             DependencyDescriptorMediator mediator = mediatorRule.getValue();
 
@@ -203,7 +203,7 @@ public final class XmlModuleDescriptorWriter {
                 Message.verbose("ignoring unhandled DependencyDescriptorMediator: "
                         + mediator.getClass());
             }
-        }
+        });
     }
 
     private static void printAllExcludes(ModuleDescriptor md, PrintWriter out) {
@@ -452,9 +452,9 @@ public final class XmlModuleDescriptorWriter {
                     out.println("\t\t</description>");
                 }
             }
-            for (ExtraInfoHolder extraInfo : md.getExtraInfos()) {
+            md.getExtraInfos().forEach((extraInfo) -> {
                 printExtraInfoElement(out, extraInfo, 2);
-            }
+            });
             out.println("\t</info>");
         } else {
             out.println("\t/>");
@@ -468,9 +468,9 @@ public final class XmlModuleDescriptorWriter {
         }
         out.print("<");
         out.print(extraInfo.getName());
-        for (Map.Entry<String, String> entry : extraInfo.getAttributes().entrySet()) {
+        extraInfo.getAttributes().entrySet().forEach((entry) -> {
             out.print(String.format(" %s=\"%s\"", entry.getKey(), entry.getValue()));
-        }
+        });
         boolean requireClosingTag = false;
         if (!isNullOrEmpty(extraInfo.getContent())) {
             out.print(">");
@@ -479,9 +479,9 @@ public final class XmlModuleDescriptorWriter {
         }
         if (!extraInfo.getNestedExtraInfoHolder().isEmpty()) {
             out.println(">");
-            for (ExtraInfoHolder nestedElement : extraInfo.getNestedExtraInfoHolder()) {
+            extraInfo.getNestedExtraInfoHolder().forEach((nestedElement) -> {
                 printExtraInfoElement(out, nestedElement, indent + 1);
-            }
+            });
             requireClosingTag = true;
             // prepare indentation for closing tag
             for (int i = 1; i <= indent; i++) {

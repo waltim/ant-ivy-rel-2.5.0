@@ -396,10 +396,10 @@ public class DefaultDependencyDescriptor implements DependencyDescriptor {
 
         Collection<Configuration> extendingConfs = Configuration.findConfigurationExtending(conf,
             md.getConfigurations());
-        for (Configuration extendingConf : extendingConfs) {
+        extendingConfs.forEach((extendingConf) -> {
             allDepConfs.addAll(Arrays.asList(
-                getDependencyConfigurations(extendingConf.getName(), requestedConfiguration)));
-        }
+                    getDependencyConfigurations(extendingConf.getName(), requestedConfiguration)));
+        });
         return allDepConfs;
     }
 
@@ -537,9 +537,9 @@ public class DefaultDependencyDescriptor implements DependencyDescriptor {
 
     private <T> Set<T> mergeAll(Map<String, Collection<T>> artifactsMap) {
         Set<T> ret = new LinkedHashSet<>();
-        for (Collection<T> artifacts : artifactsMap.values()) {
+        artifactsMap.values().forEach((artifacts) -> {
             ret.addAll(artifacts);
-        }
+        });
         return ret;
     }
 

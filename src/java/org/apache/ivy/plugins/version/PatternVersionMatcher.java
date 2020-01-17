@@ -43,14 +43,14 @@ public class PatternVersionMatcher extends AbstractVersionMatcher {
 
     private void init() {
         if (!init) {
-            for (Match match : matches) {
+            matches.forEach((match) -> {
                 List<Match> revMatches = revisionMatches.get(match.getRevision());
                 if (revMatches == null) {
                     revMatches = new ArrayList<>();
                     revisionMatches.put(match.getRevision(), revMatches);
                 }
                 revMatches.add(match);
-            }
+            });
             init = true;
         }
     }

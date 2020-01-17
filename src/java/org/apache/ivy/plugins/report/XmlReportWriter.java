@@ -88,14 +88,18 @@ public class XmlReportWriter {
         // create a list of ModuleRevisionIds indicating the position for each dependency
         List<ModuleRevisionId> dependencies = new ArrayList<>(report.getModuleRevisionIds());
 
-        for (ModuleId mid : report.getModuleIds()) {
+        report.getModuleIds().stream().map((mid) -> {
             out.println("\t\t<module organisation=\"" + XMLHelper.escape(mid.getOrganisation())
                     + "\"" + " name=\"" + XMLHelper.escape(mid.getName()) + "\">");
-            for (IvyNode dep : report.getNodes(mid)) {
+            return mid;
+        }).map((mid) -> {
+            report.getNodes(mid).forEach((dep) -> {
                 outputRevision(report, out, dependencies, dep);
-            }
+            });
+            return mid;
+        }).forEachOrdered((_item) -> {
             out.println("\t\t</module>");
-        }
+        });
         out.println("\t</dependencies>");
         out.println("</ivy-report>");
         out.flush();
@@ -170,17 +174,20 @@ public class XmlReportWriter {
 
     private String extraToString(Map<String, String> extraAttributes, String prefix) {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, String> entry : extraAttributes.entrySet()) {
+        extraAttributes.entrySet().stream().map((entry) -> {
             if (sb.length() > 0 && !SEPARATOR.equals(prefix)) {
                 sb.append(System.lineSeparator());
             }
-
             sb.append(prefix);
             sb.append(ExtendableItemHelper.encodeAttribute(entry.getKey(), "extra-"));
+            return entry;
+        }).map((entry) -> {
             sb.append("=\"");
             sb.append(XMLHelper.escape(entry.getValue()));
+            return entry;
+        }).forEachOrdered((_item) -> {
             sb.append("\"");
-        }
+        });
         return sb.toString();
     }
 
@@ -190,10 +197,10 @@ public class XmlReportWriter {
             EvictionData ed = dep.getEvictedData(report.getConfiguration());
             Collection<IvyNode> selected = ed.getSelected();
             if (selected != null) {
-                for (IvyNode sel : selected) {
+                selected.forEach((sel) -> {
                     out.println("\t\t\t\t<evicted-by rev=\""
                             + XMLHelper.escape(sel.getResolvedId().getRevision()) + "\"/>");
-                }
+                });
             }
         }
     }

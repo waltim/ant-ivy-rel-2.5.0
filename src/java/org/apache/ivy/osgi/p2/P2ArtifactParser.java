@@ -81,7 +81,7 @@ public class P2ArtifactParser implements XMLInputParser {
             addChild(new MappingsHandler(), new ChildElementHandler<MappingsHandler>() {
                 @Override
                 public void childHandled(MappingsHandler child) {
-                    for (Map.Entry<String, String> entry : child.outputByFilter.entrySet()) {
+                    child.outputByFilter.entrySet().forEach((entry) -> {
                         OSGiFilter filter;
                         try {
                             filter = OSGiFilterParser.parse(entry.getKey());
@@ -89,8 +89,7 @@ public class P2ArtifactParser implements XMLInputParser {
                             throw new IllegalStateException();
                         }
                         artifactPatterns.put(filter, entry.getValue());
-
-                    }
+                    });
                 }
             });
             addChild(new ArtifactsHandler(p2Descriptor, artifactPatterns, repoUrl),

@@ -418,11 +418,9 @@ public class DefaultModuleDescriptor implements ModuleDescriptor {
 
     public String[] getPublicConfigurationsNames() {
         List<String> ret = new ArrayList<>();
-        for (Configuration conf : configurations.values()) {
-            if (PUBLIC.equals(conf.getVisibility())) {
-                ret.add(conf.getName());
-            }
-        }
+        configurations.values().stream().filter((conf) -> (PUBLIC.equals(conf.getVisibility()))).forEachOrdered((conf) -> {
+            ret.add(conf.getName());
+        });
         return ret.toArray(new String[ret.size()]);
     }
 
@@ -442,11 +440,9 @@ public class DefaultModuleDescriptor implements ModuleDescriptor {
 
                 // this is a conf group, let's search for its members
                 Map<String, Configuration> members = new LinkedHashMap<>();
-                for (Configuration conf : configurations.values()) {
-                    if (attValue.equals(conf.getAttribute(attName))) {
-                        members.put(conf.getName(), conf);
-                    }
-                }
+                configurations.values().stream().filter((conf) -> (attValue.equals(conf.getAttribute(attName)))).forEachOrdered((conf) -> {
+                    members.put(conf.getName(), conf);
+                });
                 return new ConfigurationGroup(confName, members);
             }
 
@@ -656,10 +652,8 @@ public class DefaultModuleDescriptor implements ModuleDescriptor {
     }
 
     public boolean isNamespaceUseful() {
-        for (DependencyDescriptor dd : dependencies) {
-            if (dd.getAllExcludeRules().length > 0) {
-                return true;
-            }
+        if (dependencies.stream().anyMatch((dd) -> (dd.getAllExcludeRules().length > 0))) {
+            return true;
         }
         return false;
     }
@@ -674,13 +668,13 @@ public class DefaultModuleDescriptor implements ModuleDescriptor {
      */
     public void check() {
         Stack<String> confs = new Stack<>();
-        for (Configuration conf : configurations.values()) {
+        configurations.values().forEach((conf) -> {
             for (String ext : conf.getExtends()) {
                 confs.push(conf.getName());
                 checkConf(confs, ext.trim());
                 confs.pop();
             }
-        }
+        });
     }
 
     private void checkConf(Stack<String> confs, String confName) {
@@ -793,12 +787,12 @@ public class DefaultModuleDescriptor implements ModuleDescriptor {
 
     public ExcludeRule[] getExcludeRules(String[] moduleConfigurations) {
         Set<ExcludeRule> rules = new LinkedHashSet<>();
-        for (ExcludeRule rule : excludeRules) {
+        excludeRules.forEach((rule) -> {
             String[] ruleConfs = rule.getConfigurations();
             if (containsAny(ruleConfs, moduleConfigurations)) {
                 rules.add(rule);
             }
-        }
+        });
         return rules.toArray(new ExcludeRule[rules.size()]);
     }
 
@@ -822,17 +816,17 @@ public class DefaultModuleDescriptor implements ModuleDescriptor {
     @Deprecated
     public Map<String, String> getExtraInfo() {
         Map<String, String> map = new HashMap<>();
-        for (ExtraInfoHolder extraInfo : extraInfos) {
+        extraInfos.forEach((extraInfo) -> {
             populateExtraInfoMap(map, extraInfo);
-        }
+        });
         return map;
     }
 
     private void populateExtraInfoMap(Map<String, String> map, ExtraInfoHolder extraInfo) {
         map.put(extraInfo.getName(), extraInfo.getContent());
-        for (ExtraInfoHolder nested : extraInfo.getNestedExtraInfoHolder()) {
+        extraInfo.getNestedExtraInfoHolder().forEach((nested) -> {
             populateExtraInfoMap(map, nested);
-        }
+        });
     }
 
     public List<ExtraInfoHolder> getExtraInfos() {

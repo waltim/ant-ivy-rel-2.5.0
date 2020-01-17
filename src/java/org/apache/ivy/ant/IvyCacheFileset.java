@@ -75,13 +75,10 @@ public class IvyCacheFileset extends IvyCacheTask {
             fileset.setDir(baseDir);
             fileset.setProject(getProject());
             // enroll each of the artifact files into the fileset
-            for (final ArtifactDownloadReport artifactDownloadReport : artifactDownloadReports) {
-                if (artifactDownloadReport.getLocalFile() == null) {
-                    continue;
-                }
+            artifactDownloadReports.stream().filter((artifactDownloadReport) -> !(artifactDownloadReport.getLocalFile() == null)).forEachOrdered((artifactDownloadReport) -> {
                 final NameEntry ne = fileset.createInclude();
                 ne.setName(getPath(baseDir, artifactDownloadReport.getLocalFile()));
-            }
+            });
             getProject().addReference(setid, fileset);
         } catch (Exception ex) {
             throw new BuildException("impossible to build ivy cache fileset: " + ex, ex);

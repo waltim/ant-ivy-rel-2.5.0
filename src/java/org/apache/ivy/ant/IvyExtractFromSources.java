@@ -149,10 +149,10 @@ public class IvyExtractFromSources extends Task {
                     (status == null) ? "integration" : status));
             if (!dependencies.isEmpty()) {
                 writer.println("\t<dependencies>");
-                for (ModuleRevisionId mrid : dependencies) {
+                dependencies.forEach((mrid) -> {
                     writer.println(String.format("\t\t<dependency org=\"%s\" name=\"%s\" rev=\"%s\"/>",
                             mrid.getOrganisation(), mrid.getName(), mrid.getRevision()));
-                }
+                });
                 writer.println("\t</dependencies>");
             }
             writer.println("</ivy-module>");

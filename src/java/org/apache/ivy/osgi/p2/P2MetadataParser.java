@@ -95,9 +95,9 @@ public class P2MetadataParser implements XMLInputParser {
             addChild(new UnitsHandler(), new ChildElementHandler<UnitsHandler>() {
                 @Override
                 public void childHandled(UnitsHandler child) {
-                    for (BundleInfo bundle : child.bundles) {
+                    child.bundles.forEach((bundle) -> {
                         p2Descriptor.addBundle(bundle);
-                    }
+                    });
                 }
             });
             addChild(new ReferencesHandler(), new ChildElementHandler<ReferencesHandler>() {
@@ -273,9 +273,9 @@ public class P2MetadataParser implements XMLInputParser {
                             bundleInfo.setVersionTarget(bundleInfo.getVersion());
                         }
                     }
-                    for (BundleCapability capability : child.capabilities) {
+                    child.capabilities.forEach((capability) -> {
                         bundleInfo.addCapability(capability);
-                    }
+                    });
                 }
             });
             addChild(new FilterHandler(), new ChildElementHandler<FilterHandler>() {
@@ -286,9 +286,9 @@ public class P2MetadataParser implements XMLInputParser {
             addChild(new RequiresHandler(), new ChildElementHandler<RequiresHandler>() {
                 @Override
                 public void childHandled(RequiresHandler child) {
-                    for (BundleRequirement requirement : child.requirements) {
+                    child.requirements.forEach((requirement) -> {
                         bundleInfo.addRequirement(requirement);
-                    }
+                    });
                 }
             });
             addChild(new HostRequirementsHandler(),

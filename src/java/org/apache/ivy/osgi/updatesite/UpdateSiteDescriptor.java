@@ -33,9 +33,9 @@ public class UpdateSiteDescriptor extends EditableRepoDescriptor {
     public void addFeature(EclipseFeature feature) {
         addBundle(PluginAdapter.featureAsBundle(getBaseUri(), feature));
 
-        for (EclipsePlugin plugin : feature.getPlugins()) {
+        feature.getPlugins().forEach((plugin) -> {
             addBundle(PluginAdapter.pluginAsBundle(getBaseUri(), plugin));
-        }
+        });
     }
 
 }

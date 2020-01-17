@@ -102,16 +102,16 @@ public class IvyArtifactReport extends IvyPostResolveTask {
                                     .setConfs(confs).setResolveId(getResolveId()));
 
             Map<ModuleRevisionId, Set<ArtifactDownloadReport>> moduleRevToArtifactsMap = new HashMap<>();
-            for (ArtifactDownloadReport artifact : artifactsToCopy.keySet()) {
+            artifactsToCopy.keySet().forEach((artifact) -> {
                 Set<ArtifactDownloadReport> moduleRevArtifacts = moduleRevToArtifactsMap.get(artifact.getArtifact()
                         .getModuleRevisionId());
                 if (moduleRevArtifacts == null) {
                     moduleRevArtifacts = new HashSet<>();
                     moduleRevToArtifactsMap.put(artifact.getArtifact().getModuleRevisionId(),
-                        moduleRevArtifacts);
+                            moduleRevArtifacts);
                 }
                 moduleRevArtifacts.add(artifact);
-            }
+            });
 
             generateXml(dependencies, moduleRevToArtifactsMap, artifactsToCopy);
         } catch (ParseException e) {

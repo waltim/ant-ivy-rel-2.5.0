@@ -50,9 +50,9 @@ public final class Main {
         CommandLine line = parser.parse(options, args);
         File dir = new File(line.getOptionValue("d", "."));
           System.out.println("listing files in " + dir);
-          for (File file : ListFile.list(dir)) {
+          ListFile.list(dir).forEach((file) -> {
               System.out.println("\t" + file + "\n");
-          }
+          });
       } catch (ParseException exp) {
           // oops, something went wrong
           System.err.println("Parsing failed.  Reason: " + exp.getMessage());

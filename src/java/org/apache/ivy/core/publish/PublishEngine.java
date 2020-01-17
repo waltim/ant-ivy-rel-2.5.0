@@ -209,10 +209,10 @@ public class PublishEngine {
             if (!artifactsFiles.containsKey(artifact)) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("missing artifact ").append(artifact).append(":\n");
-                for (String pattern : srcArtifactPattern) {
+                srcArtifactPattern.forEach((pattern) -> {
                     sb.append("\t").append(settings.resolveFile(IvyPatternHelper.substitute(pattern,
                             artifact))).append(" file does not exist\n");
-                }
+                });
                 if (options.isWarnOnMissing() || options.isHaltOnMissing()) {
                     Message.warn(sb.toString());
                 } else {

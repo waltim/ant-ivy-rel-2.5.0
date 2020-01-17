@@ -329,9 +329,9 @@ public class OBRResolverTest {
         assertFalse("resolve failed " + resolveReport.getAllProblemMessages(),
             resolveReport.hasError());
         Set<ModuleRevisionId> actual = new HashSet<>();
-        for (Artifact artifact : resolveReport.getArtifacts()) {
+        resolveReport.getArtifacts().forEach((artifact) -> {
             actual.add(artifact.getModuleRevisionId());
-        }
+        });
         Set<ModuleRevisionId> expected = new HashSet<>(Arrays.asList(expectedMrids));
         if (expected2Mrids != null) {
             // in this use case, we have two choices, let's try the second one

@@ -321,9 +321,9 @@ public class IvyReport extends IvyTask {
             transformer.setParameter("extension", xslext);
 
             // add the provided XSLT parameters
-            for (XSLTProcess.Param param : params) {
+            params.forEach((param) -> {
                 transformer.setParameter(param.getName(), param.getExpression());
-            }
+            });
 
             // create the report
             for (String config : confs) {

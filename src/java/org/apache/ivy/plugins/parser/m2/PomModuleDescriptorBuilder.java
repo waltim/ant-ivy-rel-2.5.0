@@ -126,62 +126,52 @@ public class PomModuleDescriptorBuilder {
     }
 
     static {
-        MAVEN2_CONF_MAPPING.put("compile", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                if (isOptional) {
-                    dd.addDependencyConfiguration("optional", "compile(*)");
-                    // dd.addDependencyConfiguration("optional", "provided(*)");
-                    dd.addDependencyConfiguration("optional", "master(*)");
-
-                } else {
-                    dd.addDependencyConfiguration("compile", "compile(*)");
-                    // dd.addDependencyConfiguration("compile", "provided(*)");
-                    dd.addDependencyConfiguration("compile", "master(*)");
-                    dd.addDependencyConfiguration("runtime", "runtime(*)");
-                }
+        MAVEN2_CONF_MAPPING.put("compile", (ConfMapper) (DefaultDependencyDescriptor dd, boolean isOptional) -> {
+            if (isOptional) {
+                dd.addDependencyConfiguration("optional", "compile(*)");
+                // dd.addDependencyConfiguration("optional", "provided(*)");
+                dd.addDependencyConfiguration("optional", "master(*)");
+                
+            } else {
+                dd.addDependencyConfiguration("compile", "compile(*)");
+                // dd.addDependencyConfiguration("compile", "provided(*)");
+                dd.addDependencyConfiguration("compile", "master(*)");
+                dd.addDependencyConfiguration("runtime", "runtime(*)");
             }
         });
-        MAVEN2_CONF_MAPPING.put("provided", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                if (isOptional) {
-                    dd.addDependencyConfiguration("optional", "compile(*)");
-                    dd.addDependencyConfiguration("optional", "provided(*)");
-                    dd.addDependencyConfiguration("optional", "runtime(*)");
-                    dd.addDependencyConfiguration("optional", "master(*)");
-                } else {
-                    dd.addDependencyConfiguration("provided", "compile(*)");
-                    dd.addDependencyConfiguration("provided", "provided(*)");
-                    dd.addDependencyConfiguration("provided", "runtime(*)");
-                    dd.addDependencyConfiguration("provided", "master(*)");
-                }
+        MAVEN2_CONF_MAPPING.put("provided", (ConfMapper) (DefaultDependencyDescriptor dd, boolean isOptional) -> {
+            if (isOptional) {
+                dd.addDependencyConfiguration("optional", "compile(*)");
+                dd.addDependencyConfiguration("optional", "provided(*)");
+                dd.addDependencyConfiguration("optional", "runtime(*)");
+                dd.addDependencyConfiguration("optional", "master(*)");
+            } else {
+                dd.addDependencyConfiguration("provided", "compile(*)");
+                dd.addDependencyConfiguration("provided", "provided(*)");
+                dd.addDependencyConfiguration("provided", "runtime(*)");
+                dd.addDependencyConfiguration("provided", "master(*)");
             }
         });
-        MAVEN2_CONF_MAPPING.put("runtime", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                if (isOptional) {
-                    dd.addDependencyConfiguration("optional", "compile(*)");
-                    dd.addDependencyConfiguration("optional", "provided(*)");
-                    dd.addDependencyConfiguration("optional", "master(*)");
-
-                } else {
-                    dd.addDependencyConfiguration("runtime", "compile(*)");
-                    dd.addDependencyConfiguration("runtime", "runtime(*)");
-                    dd.addDependencyConfiguration("runtime", "master(*)");
-                }
+        MAVEN2_CONF_MAPPING.put("runtime", (ConfMapper) (DefaultDependencyDescriptor dd, boolean isOptional) -> {
+            if (isOptional) {
+                dd.addDependencyConfiguration("optional", "compile(*)");
+                dd.addDependencyConfiguration("optional", "provided(*)");
+                dd.addDependencyConfiguration("optional", "master(*)");
+                
+            } else {
+                dd.addDependencyConfiguration("runtime", "compile(*)");
+                dd.addDependencyConfiguration("runtime", "runtime(*)");
+                dd.addDependencyConfiguration("runtime", "master(*)");
             }
         });
-        MAVEN2_CONF_MAPPING.put("test", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                // optional doesn't make sense in the test scope
-                dd.addDependencyConfiguration("test", "runtime(*)");
-                dd.addDependencyConfiguration("test", "master(*)");
-            }
+        MAVEN2_CONF_MAPPING.put("test", (ConfMapper) (DefaultDependencyDescriptor dd, boolean isOptional) -> {
+            // optional doesn't make sense in the test scope
+            dd.addDependencyConfiguration("test", "runtime(*)");
+            dd.addDependencyConfiguration("test", "master(*)");
         });
-        MAVEN2_CONF_MAPPING.put("system", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                // optional doesn't make sense in the system scope
-                dd.addDependencyConfiguration("system", "master(*)");
-            }
+        MAVEN2_CONF_MAPPING.put("system", (ConfMapper) (DefaultDependencyDescriptor dd, boolean isOptional) -> {
+            // optional doesn't make sense in the system scope
+            dd.addDependencyConfiguration("system", "master(*)");
         });
     }
 
@@ -366,13 +356,8 @@ public class PomModuleDescriptorBuilder {
         if (exclusions == null || exclusions.isEmpty()) {
             return false;
         }
-        for (final ModuleId exclusion : exclusions) {
-            if (exclusion == null) {
-                continue;
-            }
-            if ("*".equals(exclusion.getOrganisation()) && "*".equals(exclusion.getName())) {
-                return true;
-            }
+        if (exclusions.stream().filter((exclusion) -> !(exclusion == null)).anyMatch((exclusion) -> ("*".equals(exclusion.getOrganisation()) && "*".equals(exclusion.getName())))) {
+            return true;
         }
         return false;
     }
@@ -561,13 +546,13 @@ public class PomModuleDescriptorBuilder {
     public static Map<ModuleId, String> getDependencyManagementMap(ModuleDescriptor md) {
         Map<ModuleId, String> ret = new LinkedHashMap<>();
         if (md instanceof PomModuleDescriptor) {
-            for (Map.Entry<ModuleId, PomDependencyMgt> e : ((PomModuleDescriptor) md)
-                    .getDependencyManagementMap().entrySet()) {
-                PomDependencyMgt dependencyMgt = e.getValue();
-                ret.put(e.getKey(), dependencyMgt.getVersion());
-            }
+            ((PomModuleDescriptor) md)
+                    .getDependencyManagementMap().entrySet().forEach((e) -> {
+                        PomDependencyMgt dependencyMgt = e.getValue();
+                        ret.put(e.getKey(), dependencyMgt.getVersion());
+            });
         } else {
-            for (ExtraInfoHolder extraInfoHolder : md.getExtraInfos()) {
+            md.getExtraInfos().forEach((extraInfoHolder) -> {
                 String key = extraInfoHolder.getName();
                 if (key.startsWith(DEPENDENCY_MANAGEMENT)) {
                     String[] parts = key.split(EXTRA_INFO_DELIMITER);
@@ -576,10 +561,10 @@ public class PomModuleDescriptorBuilder {
                                 + "doesn't match expected pattern: " + key);
                     } else {
                         ret.put(ModuleId.newInstance(parts[1], parts[2]),
-                            extraInfoHolder.getContent());
+                                extraInfoHolder.getContent());
                     }
                 }
-            }
+            });
         }
         return ret;
     }
@@ -590,39 +575,36 @@ public class PomModuleDescriptorBuilder {
         if (md instanceof PomModuleDescriptor) {
             result.addAll(((PomModuleDescriptor) md).getDependencyManagementMap().values());
         } else {
-            for (ExtraInfoHolder extraInfoHolder : md.getExtraInfos()) {
-                String key = extraInfoHolder.getName();
-                if (key.startsWith(DEPENDENCY_MANAGEMENT)) {
-                    String[] parts = key.split(EXTRA_INFO_DELIMITER);
-                    if (parts.length != DEPENDENCY_MANAGEMENT_KEY_PARTS_COUNT) {
-                        Message.warn("what seem to be a dependency management extra info "
-                                + "doesn't match expected pattern: " + key);
-                    } else {
-                        String versionKey = DEPENDENCY_MANAGEMENT + EXTRA_INFO_DELIMITER + parts[1]
-                                + EXTRA_INFO_DELIMITER + parts[2] + EXTRA_INFO_DELIMITER
-                                + "version";
-                        String scopeKey = DEPENDENCY_MANAGEMENT + EXTRA_INFO_DELIMITER + parts[1]
-                                + EXTRA_INFO_DELIMITER + parts[2] + EXTRA_INFO_DELIMITER + "scope";
-
-                        String version = md.getExtraInfoContentByTagName(versionKey);
-                        String scope = md.getExtraInfoContentByTagName(scopeKey);
-
-                        List<ModuleId> exclusions = getDependencyMgtExclusions(md, parts[1],
+            md.getExtraInfos().stream().map((extraInfoHolder) -> extraInfoHolder.getName()).filter((key) -> (key.startsWith(DEPENDENCY_MANAGEMENT))).forEachOrdered((key) -> {
+                String[] parts = key.split(EXTRA_INFO_DELIMITER);
+                if (parts.length != DEPENDENCY_MANAGEMENT_KEY_PARTS_COUNT) {
+                    Message.warn("what seem to be a dependency management extra info "
+                            + "doesn't match expected pattern: " + key);
+                } else {
+                    String versionKey = DEPENDENCY_MANAGEMENT + EXTRA_INFO_DELIMITER + parts[1]
+                            + EXTRA_INFO_DELIMITER + parts[2] + EXTRA_INFO_DELIMITER
+                            + "version";
+                    String scopeKey = DEPENDENCY_MANAGEMENT + EXTRA_INFO_DELIMITER + parts[1]
+                            + EXTRA_INFO_DELIMITER + parts[2] + EXTRA_INFO_DELIMITER + "scope";
+                    
+                    String version = md.getExtraInfoContentByTagName(versionKey);
+                    String scope = md.getExtraInfoContentByTagName(scopeKey);
+                    
+                    List<ModuleId> exclusions = getDependencyMgtExclusions(md, parts[1],
                             parts[2]);
-                        result.add(new DefaultPomDependencyMgt(parts[1], parts[2], version, scope,
-                                exclusions));
-                    }
+                    result.add(new DefaultPomDependencyMgt(parts[1], parts[2], version, scope,
+                            exclusions));
                 }
-            }
+            });
         }
         return result;
     }
 
     @Deprecated
     public void addExtraInfos(Map<String, String> extraAttributes) {
-        for (Map.Entry<String, String> entry : extraAttributes.entrySet()) {
+        extraAttributes.entrySet().forEach((entry) -> {
             addExtraInfo(entry.getKey(), entry.getValue());
-        }
+        });
     }
 
     private void addExtraInfo(String key, String value) {
@@ -645,33 +627,29 @@ public class PomModuleDescriptorBuilder {
     }
 
     public void addExtraInfos(List<ExtraInfoHolder> extraInfosHolder) {
-        for (ExtraInfoHolder extraInfoHolder : extraInfosHolder) {
+        extraInfosHolder.forEach((extraInfoHolder) -> {
             addExtraInfo(extraInfoHolder.getName(), extraInfoHolder.getContent());
-        }
+        });
     }
 
     @Deprecated
     public static Map<String, String> extractPomProperties(Map<String, String> extraInfo) {
         Map<String, String> r = new HashMap<>();
-        for (Map.Entry<String, String> extraInfoEntry : extraInfo.entrySet()) {
-            if (extraInfoEntry.getKey().startsWith(PROPERTIES)) {
-                String prop = extraInfoEntry.getKey().substring(PROPERTIES.length()
-                        + EXTRA_INFO_DELIMITER.length());
-                r.put(prop, extraInfoEntry.getValue());
-            }
-        }
+        extraInfo.entrySet().stream().filter((extraInfoEntry) -> (extraInfoEntry.getKey().startsWith(PROPERTIES))).forEachOrdered((extraInfoEntry) -> {
+            String prop = extraInfoEntry.getKey().substring(PROPERTIES.length()
+                    + EXTRA_INFO_DELIMITER.length());
+            r.put(prop, extraInfoEntry.getValue());
+        });
         return r;
     }
 
     public static Map<String, String> extractPomProperties(List<ExtraInfoHolder> extraInfos) {
         Map<String, String> r = new HashMap<>();
-        for (ExtraInfoHolder extraInfoHolder : extraInfos) {
-            if (extraInfoHolder.getName().startsWith(PROPERTIES)) {
-                String prop = extraInfoHolder.getName().substring(PROPERTIES.length()
-                        + EXTRA_INFO_DELIMITER.length());
-                r.put(prop, extraInfoHolder.getContent());
-            }
-        }
+        extraInfos.stream().filter((extraInfoHolder) -> (extraInfoHolder.getName().startsWith(PROPERTIES))).forEachOrdered((extraInfoHolder) -> {
+            String prop = extraInfoHolder.getName().substring(PROPERTIES.length()
+                    + EXTRA_INFO_DELIMITER.length());
+            r.put(prop, extraInfoHolder.getContent());
+        });
         return r;
     }
 

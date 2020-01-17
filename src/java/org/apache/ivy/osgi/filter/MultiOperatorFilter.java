@@ -40,9 +40,9 @@ public abstract class MultiOperatorFilter extends OSGiFilter {
     public void append(StringBuffer builder) {
         builder.append('(');
         builder.append(operator());
-        for (OSGiFilter filter : subFilters) {
+        subFilters.forEach((filter) -> {
             filter.append(builder);
-        }
+        });
         builder.append(')');
     }
 
