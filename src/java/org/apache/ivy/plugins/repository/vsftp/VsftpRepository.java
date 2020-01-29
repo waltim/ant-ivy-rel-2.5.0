@@ -385,67 +385,65 @@ public class VsftpRepository extends AbstractRepository {
         final StringBuilder response = new StringBuilder();
         final IOException[] exc = new IOException[1];
         final boolean[] done = new boolean[1];
-        Runnable r = new Runnable() {
-            public void run() {
-                synchronized (VsftpRepository.this) {
-                    try {
-                        int c;
-                        boolean getPrompt = false;
-                        // the reading is done in a loop making five attempts to read the stream
-                        // if we do not reach the next prompt
-                        int attempt = 0;
-                        while (!getPrompt && attempt < MAX_READ_PROMPT_ATTEMPT) {
-                            while ((c = in.read()) != -1) {
-                                // we managed to read something, reset number of attempts
-                                attempt = 0;
-                                response.append((char) c);
-                                if (response.length() >= PROMPT.length()
-                                        && response.substring(response.length() - PROMPT.length(),
-                                            response.length()).equals(PROMPT)) {
-                                    response.setLength(response.length() - PROMPT.length());
-                                    getPrompt = true;
-                                    break;
-                                }
-                            }
-                            if (!getPrompt) {
-                                try {
-                                    Thread.sleep(PROMPT_SLEEP_TIME);
-                                } catch (InterruptedException e) {
-                                    break;
-                                }
-                            }
-                            attempt++;
-                        }
-                        if (getPrompt) {
-                            // wait enough for error stream to be fully read
-                            if (errorsLastUpdateTime == 0) {
-                                // no error written yet, but it may be pending...
-                                errorsLastUpdateTime = lastCommand;
-                            }
-
-                            while ((System.currentTimeMillis() - errorsLastUpdateTime) < PROMPT_SLEEP_TIME) {
-                                try {
-                                    Thread.sleep(ERROR_SLEEP_TIME);
-                                } catch (InterruptedException e) {
-                                    break;
-                                }
+        Runnable r = () -> {
+            synchronized (VsftpRepository.this) {
+                try {
+                    int c;
+                    boolean getPrompt = false;
+                    // the reading is done in a loop making five attempts to read the stream
+                    // if we do not reach the next prompt
+                    int attempt = 0;
+                    while (!getPrompt && attempt < MAX_READ_PROMPT_ATTEMPT) {
+                        while ((c = in.read()) != -1) {
+                            // we managed to read something, reset number of attempts
+                            attempt = 0;
+                            response.append((char) c);
+                            if (response.length() >= PROMPT.length()
+                                    && response.substring(response.length() - PROMPT.length(),
+                                        response.length()).equals(PROMPT)) {
+                                response.setLength(response.length() - PROMPT.length());
+                                getPrompt = true;
+                                break;
                             }
                         }
-                        if (errors.length() > 0) {
-                            if (sendErrorAsResponse) {
-                                response.append(errors);
-                                errors.setLength(0);
-                            } else {
-                                throw new IOException(chomp(errors).toString());
+                        if (!getPrompt) {
+                            try {
+                                Thread.sleep(PROMPT_SLEEP_TIME);
+                            } catch (InterruptedException e) {
+                                break;
                             }
                         }
-                        chomp(response);
-                        done[0] = true;
-                    } catch (IOException e) {
-                        exc[0] = e;
-                    } finally {
-                        VsftpRepository.this.notify();
+                        attempt++;
                     }
+                    if (getPrompt) {
+                        // wait enough for error stream to be fully read
+                        if (errorsLastUpdateTime == 0) {
+                            // no error written yet, but it may be pending...
+                            errorsLastUpdateTime = lastCommand;
+                        }
+
+                        while ((System.currentTimeMillis() - errorsLastUpdateTime) < PROMPT_SLEEP_TIME) {
+                            try {
+                                Thread.sleep(ERROR_SLEEP_TIME);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+                        }
+                    }
+                    if (errors.length() > 0) {
+                        if (sendErrorAsResponse) {
+                            response.append(errors);
+                            errors.setLength(0);
+                        } else {
+                            throw new IOException(chomp(errors).toString());
+                        }
+                    }
+                    chomp(response);
+                    done[0] = true;
+                } catch (IOException e) {
+                    exc[0] = e;
+                } finally {
+                    VsftpRepository.this.notify();
                 }
             }
         };

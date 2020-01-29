@@ -126,62 +126,52 @@ public class PomModuleDescriptorBuilder {
     }
 
     static {
-        MAVEN2_CONF_MAPPING.put("compile", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                if (isOptional) {
-                    dd.addDependencyConfiguration("optional", "compile(*)");
-                    // dd.addDependencyConfiguration("optional", "provided(*)");
-                    dd.addDependencyConfiguration("optional", "master(*)");
+        MAVEN2_CONF_MAPPING.put("compile", (dd, isOptional) -> {
+            if (isOptional) {
+                dd.addDependencyConfiguration("optional", "compile(*)");
+                // dd.addDependencyConfiguration("optional", "provided(*)");
+                dd.addDependencyConfiguration("optional", "master(*)");
 
-                } else {
-                    dd.addDependencyConfiguration("compile", "compile(*)");
-                    // dd.addDependencyConfiguration("compile", "provided(*)");
-                    dd.addDependencyConfiguration("compile", "master(*)");
-                    dd.addDependencyConfiguration("runtime", "runtime(*)");
-                }
+            } else {
+                dd.addDependencyConfiguration("compile", "compile(*)");
+                // dd.addDependencyConfiguration("compile", "provided(*)");
+                dd.addDependencyConfiguration("compile", "master(*)");
+                dd.addDependencyConfiguration("runtime", "runtime(*)");
             }
         });
-        MAVEN2_CONF_MAPPING.put("provided", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                if (isOptional) {
-                    dd.addDependencyConfiguration("optional", "compile(*)");
-                    dd.addDependencyConfiguration("optional", "provided(*)");
-                    dd.addDependencyConfiguration("optional", "runtime(*)");
-                    dd.addDependencyConfiguration("optional", "master(*)");
-                } else {
-                    dd.addDependencyConfiguration("provided", "compile(*)");
-                    dd.addDependencyConfiguration("provided", "provided(*)");
-                    dd.addDependencyConfiguration("provided", "runtime(*)");
-                    dd.addDependencyConfiguration("provided", "master(*)");
-                }
+        MAVEN2_CONF_MAPPING.put("provided", (dd, isOptional) -> {
+            if (isOptional) {
+                dd.addDependencyConfiguration("optional", "compile(*)");
+                dd.addDependencyConfiguration("optional", "provided(*)");
+                dd.addDependencyConfiguration("optional", "runtime(*)");
+                dd.addDependencyConfiguration("optional", "master(*)");
+            } else {
+                dd.addDependencyConfiguration("provided", "compile(*)");
+                dd.addDependencyConfiguration("provided", "provided(*)");
+                dd.addDependencyConfiguration("provided", "runtime(*)");
+                dd.addDependencyConfiguration("provided", "master(*)");
             }
         });
-        MAVEN2_CONF_MAPPING.put("runtime", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                if (isOptional) {
-                    dd.addDependencyConfiguration("optional", "compile(*)");
-                    dd.addDependencyConfiguration("optional", "provided(*)");
-                    dd.addDependencyConfiguration("optional", "master(*)");
+        MAVEN2_CONF_MAPPING.put("runtime", (dd, isOptional) -> {
+            if (isOptional) {
+                dd.addDependencyConfiguration("optional", "compile(*)");
+                dd.addDependencyConfiguration("optional", "provided(*)");
+                dd.addDependencyConfiguration("optional", "master(*)");
 
-                } else {
-                    dd.addDependencyConfiguration("runtime", "compile(*)");
-                    dd.addDependencyConfiguration("runtime", "runtime(*)");
-                    dd.addDependencyConfiguration("runtime", "master(*)");
-                }
+            } else {
+                dd.addDependencyConfiguration("runtime", "compile(*)");
+                dd.addDependencyConfiguration("runtime", "runtime(*)");
+                dd.addDependencyConfiguration("runtime", "master(*)");
             }
         });
-        MAVEN2_CONF_MAPPING.put("test", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                // optional doesn't make sense in the test scope
-                dd.addDependencyConfiguration("test", "runtime(*)");
-                dd.addDependencyConfiguration("test", "master(*)");
-            }
+        MAVEN2_CONF_MAPPING.put("test", (dd, isOptional) -> {
+            // optional doesn't make sense in the test scope
+            dd.addDependencyConfiguration("test", "runtime(*)");
+            dd.addDependencyConfiguration("test", "master(*)");
         });
-        MAVEN2_CONF_MAPPING.put("system", new ConfMapper() {
-            public void addMappingConfs(DefaultDependencyDescriptor dd, boolean isOptional) {
-                // optional doesn't make sense in the system scope
-                dd.addDependencyConfiguration("system", "master(*)");
-            }
+        MAVEN2_CONF_MAPPING.put("system", (dd, isOptional) -> {
+            // optional doesn't make sense in the system scope
+            dd.addDependencyConfiguration("system", "master(*)");
         });
     }
 

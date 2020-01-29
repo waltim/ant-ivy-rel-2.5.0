@@ -156,24 +156,16 @@ public class DefaultRepositoryCacheManagerTest {
         resolver.setName("resolver1");
         resolver.setSettings(ivy.getSettings());
         ivy.getSettings().addResolver(resolver);
-        ResourceDownloader downloader = new ResourceDownloader() {
-            public void download(Artifact artifact, Resource resource, File dest)
-                    throws IOException {
-                String content = "<ivy-module version=\"2.0\"><info organisation=\"org\" module=\"module\" status=\"integration\" revision=\"1.1\" branch=\"trunk\"/></ivy-module>";
-                dest.getParentFile().mkdirs();
-                FileOutputStream out = new FileOutputStream(dest);
-                PrintWriter pw = new PrintWriter(out);
-                pw.write(content);
-                pw.flush();
-                out.close();
-            }
+        ResourceDownloader downloader = (artifact, resource, dest) -> {
+            String content = "<ivy-module version=\"2.0\"><info organisation=\"org\" module=\"module\" status=\"integration\" revision=\"1.1\" branch=\"trunk\"/></ivy-module>";
+            dest.getParentFile().mkdirs();
+            FileOutputStream out = new FileOutputStream(dest);
+            PrintWriter pw = new PrintWriter(out);
+            pw.write(content);
+            pw.flush();
+            out.close();
         };
-        ModuleDescriptorWriter writer = new ModuleDescriptorWriter() {
-            public void write(ResolvedResource originalMdResource, ModuleDescriptor md, File src,
-                              File dest) throws IOException {
-                XmlModuleDescriptorWriter.write(md, dest);
-            }
-        };
+        ModuleDescriptorWriter writer = (originalMdResource, md, src, dest) -> XmlModuleDescriptorWriter.write(md, dest);
 
         // latest.integration will resolve to 1.1 in resolver1
         ModuleRevisionId mrid11 = new ModuleRevisionId(mi, "trunk", "1.1");

@@ -44,20 +44,12 @@ public class FSManifestIterable extends AbstractFSManifestIterable<File> {
      * Default directory filter that doesn't select .svn directories, neither the directories that
      * match {@link #NON_BUNDLE_DIRS}.
      */
-    public static final FilenameFilter DEFAULT_DIR_FILTER = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return !name.equals(".svn") && !NON_BUNDLE_DIRS.contains(name);
-        }
-    };
+    public static final FilenameFilter DEFAULT_DIR_FILTER = (dir, name) -> !name.equals(".svn") && !NON_BUNDLE_DIRS.contains(name);
 
     /**
      * Default bundle filter that select only .jar files
      */
-    public static final FilenameFilter DEFAULT_BUNDLE_FILTER = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".jar");
-        }
-    };
+    public static final FilenameFilter DEFAULT_BUNDLE_FILTER = (dir, name) -> name.endsWith(".jar");
 
     /**
      * Deprecated because of renaming due spell check.
@@ -110,18 +102,10 @@ public class FSManifestIterable extends AbstractFSManifestIterable<File> {
     }
 
     protected List<File> listBundleFiles(File dir) throws IOException {
-        return Arrays.asList(dir.listFiles(new FileFilter() {
-            public boolean accept(File f) {
-                return f.isFile() && bundleFilter.accept(f.getParentFile(), f.getName());
-            }
-        }));
+        return Arrays.asList(dir.listFiles(f -> f.isFile() && bundleFilter.accept(f.getParentFile(), f.getName())));
     }
 
     protected List<File> listDirs(File dir) throws IOException {
-        return Arrays.asList(dir.listFiles(new FileFilter() {
-            public boolean accept(File f) {
-                return f.isDirectory() && (dirFilter == null || dirFilter.accept(f.getParentFile(), f.getName()));
-            }
-        }));
+        return Arrays.asList(dir.listFiles(f -> f.isDirectory() && (dirFilter == null || dirFilter.accept(f.getParentFile(), f.getName()))));
     }
 }

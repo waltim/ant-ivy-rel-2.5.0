@@ -135,11 +135,7 @@ public class XmlSettingsParser extends DefaultHandler {
 
     public void parse(URL settings) throws ParseException, IOException {
         configurator = new Configurator();
-        configurator.setFileResolver(new FileResolver() {
-            public File resolveFile(String path, String filename) {
-                return Checks.checkAbsolute(path, filename);
-            }
-        });
+        configurator.setFileResolver((path, filename) -> Checks.checkAbsolute(path, filename));
         // put every type definition from ivy to configurator
         for (Map.Entry<String, Class<?>> entry : ivy.getTypeDefs().entrySet()) {
             configurator.typeDef(entry.getKey(), entry.getValue());
